@@ -24,6 +24,8 @@ jobs:
         with:
           enable-cache: true
       - run: uv sync --locked
+      - run: python scripts/generate_runtime_lock.py --check
+      - run: python scripts/start_server.py --show-command > /tmp/excel-mcp-command.json
       - run: uv run ruff format --check .
       - run: uv run ruff check .
       - run: uv run pyright
