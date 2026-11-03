@@ -23,8 +23,6 @@ OUTPUT_PATH = ROOT / "runtime-lock.json"
 def build_manifest() -> dict:
     project = tomllib.loads(PROJECT_PATH.read_text(encoding="utf-8"))
     lock = tomllib.loads(LOCK_PATH.read_text(encoding="utf-8"))
-    source = json.loads(SOURCE_PATH.read_text(encoding="utf-8"))
-
     project_meta = project["project"]
     root_name = project_meta["name"]
     packages = {item["name"]: item for item in lock["package"]}
