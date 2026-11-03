@@ -76,7 +76,7 @@ def package_is_applicable(package: dict, environment: dict[str, str]) -> bool:
     )
 
 
-def build_command(lock: dict, uvx: str, server_args: list[str]) -> list[str]:
+def build_command(lock: dict, uvx: str, server_args: list[str]) -> tuple[list[str], list[dict]]:
     environment = {
         "sys_platform": sys.platform,
         "python_version": f"{sys.version_info.major}.{sys.version_info.minor}",
