@@ -9,7 +9,7 @@
 <p align="center">
   <a href="https://pypi.org/project/yangzhendong394-excel-mcp-server/"><img src="https://img.shields.io/pypi/v/yangzhendong394-excel-mcp-server.svg" alt="PyPI version"></a>
   <a href="https://pypi.org/project/yangzhendong394-excel-mcp-server/"><img src="https://img.shields.io/pypi/pyversions/yangzhendong394-excel-mcp-server.svg" alt="Python versions"></a>
-  <a href="https://pepy.tech/project/yangzhendong394-excel-mcp-server"><img src="https://static.pepy.tech/badge/excel-mcp-server" alt="Downloads"></a>
+  <a href="https://pepy.tech/project/yangzhendong394-excel-mcp-server"><img src="https://static.pepy.tech/badge/yangzhendong394-excel-mcp-server" alt="Downloads"></a>
   <a href="https://github.com/YangZhendong394/excel-mcp-server/actions/workflows/ci.yml"><img src="https://github.com/YangZhendong394/excel-mcp-server/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
@@ -85,8 +85,7 @@ they are.
 
 You need [uv](https://docs.astral.sh/uv/getting-started/installation/). The examples below pin this maintained distribution to the tested package version. Every client runs the
 server with `uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server stdio`; replace `/path/to/workbooks` with the folder the
-server may use. [excelmcpserver.com](https://excelmcpserver.com) has the same steps with copy
-buttons and one-click install links for Cursor and VS Code.
+server may use. For the upstream project and its original documentation, see [the upstream repository](https://github.com/haris-musa/excel-mcp-server).
 
 **Claude Desktop (Chat)**: the prebuilt MCP bundle linked by the upstream project is not this maintained distribution. To use this distribution, configure Claude with the `uvx --from` command shown below, or build the bundle from this repository.
 
