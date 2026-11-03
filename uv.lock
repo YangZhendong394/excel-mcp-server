@@ -233,8 +233,8 @@ wheels = [
 ]
 
 [[package]]
-name = "excel-mcp-server"
-version = "2.2.6"
+name = "yangzhendong394-excel-mcp-server"
+version = "2.2.6.post1"
 source = { editable = "." }
 dependencies = [
     { name = "mcp" },
