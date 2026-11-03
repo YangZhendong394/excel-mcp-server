@@ -4,6 +4,7 @@
 The test forces uv offline and disables registry indexes. It uses a fresh uv
 cache so a successful run proves the wheelhouse is self-contained.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -37,8 +38,7 @@ def read_response(
         except queue.Empty:
             if process.poll() is not None:
                 raise RuntimeError(
-                    f"Server exited before response {message_id}; "
-                    f"exit code={process.returncode}"
+                    f"Server exited before response {message_id}; exit code={process.returncode}"
                 )
             continue
 
@@ -173,9 +173,7 @@ def main() -> int:
             print(f"tools_list=OK", flush=True)
             print(f"tool_count={len(tools)}", flush=True)
             if len(tools) < 40:
-                raise RuntimeError(
-                    f"Expected at least 40 Excel tools; received {len(tools)}"
-                )
+                raise RuntimeError(f"Expected at least 40 Excel tools; received {len(tools)}")
             print("RESULT=SUCCESS", flush=True)
             return 0
 
