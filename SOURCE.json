@@ -25,9 +25,10 @@
       "WorkBuddy-oriented packaging metadata and documentation",
       "Separate release workflow identity",
       "Future dependency and runtime hardening",
-      "Exact runtime dependency lock with artifact URLs and SHA-256 hashes"
+      "Exact runtime dependency lock with artifact URLs and SHA-256 hashes",
+      "Version metadata compatibility for the maintained PyPI distribution name"
     ],
-    "core_engine": "At this baseline, core engine source is inherited unchanged from the upstream commit listed above."
+    "core_engine": "The upstream Excel processing behavior is retained. The package initializer was adapted to read this maintained distribution's version metadata first and fall back to the original upstream distribution name when used from an upstream installation."
   },
   "status": "Preparation only; this version has not yet been published to PyPI."
 }
