@@ -3,7 +3,8 @@
 
 Usage:
   python scripts/excel_mcp_bridge.py --allow-dir "C:\\Workbooks" list-tools
-  python scripts/excel_mcp_bridge.py --allow-dir "C:\\Workbooks" call-tool read_range --arguments-json '{"workbook_path":"book.xlsx","range":"A1:C5"}'
+  python scripts/excel_mcp_bridge.py --allow-dir "C:\\Workbooks" call-tool read_range \
+    --arguments-json '{"path":"book.xlsx","sheet":"Sheet1","range":"A1:C5"}'
 
 The bridge starts the local, hash-verified runtime launcher, performs an MCP
 handshake, invokes one tool, prints a JSON result, and shuts the server down.
@@ -12,6 +13,7 @@ handshake, invokes one tool, prints a JSON result, and shuts the server down.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import queue
 import subprocess
@@ -21,8 +23,6 @@ import time
 from collections import deque
 from pathlib import Path
 from typing import Any
-
-
 ROOT = Path(__file__).resolve().parents[1]
 LAUNCHER = ROOT / "scripts" / "start_server.py"
 
@@ -45,7 +45,7 @@ def read_response(
             if process.poll() is not None:
                 raise BridgeError(
                     f"Excel MCP server stopped before replying (exit code {process.returncode})."
-                )
+                ) from None
             continue
         try:
             payload = json.loads(line)
@@ -205,10 +205,8 @@ def main() -> int:
             process.terminate()
             process.wait(timeout=8)
         except Exception:
-            try:
+            with contextlib.suppress(Exception):
                 process.kill()
-            except Exception:
-                pass
 
 
 if __name__ == "__main__":
