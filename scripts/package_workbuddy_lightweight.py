@@ -6,8 +6,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import shutil
-import sys
 import zipfile
 from pathlib import Path
 
@@ -33,6 +33,7 @@ def copy_vendor(source: Path, destination: Path) -> list[dict[str, str]]:
         copied.append({"name": package, "version": PINNED_VERSIONS[package]})
 
     dist_infos = list(source.glob("*.dist-info"))
+    normalize = lambda value: re.sub(r"[-_.]+", "-", value).lower()
     license_targets = {
         "openpyxl": destination.parent / "vendor-licenses" / "openpyxl-LICENCE.rst",
         "et_xmlfile": destination.parent / "vendor-licenses" / "et-xmlfile-LICENSE",
@@ -44,7 +45,7 @@ def copy_vendor(source: Path, destination: Path) -> list[dict[str, str]]:
             for candidate in dist.rglob("*")
             if candidate.is_file()
             and candidate.name.lower() in {"license", "licence", "license.txt", "licence.txt", "license.rst", "licence.rst"}
-            and package.replace("_", "-") in dist.name.lower()
+            and normalize(package) in normalize(dist.name)
         ]
         if matching:
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -82,6 +83,7 @@ def main() -> int:
     try:
         for required in ("SKILL.md", "README.md", "THIRD_PARTY_NOTICES.md"):
             shutil.copy2(SKILL_SOURCE / required, stage / required)
+        (stage / "scripts").mkdir(parents=True, exist_ok=True)
         shutil.copy2(SKILL_SOURCE / "scripts" / "excel_workbook.py", stage / "scripts" / "excel_workbook.py")
         shutil.copy2(ROOT / "LICENSE", stage / "LICENSE")
         vendor_dest = stage / "vendor"
