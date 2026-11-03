@@ -11,6 +11,9 @@ This file records changes specific to the maintained distribution. See the upstr
 - Updated the package URLs, server metadata, bundle manifest, and PyPI release destination.
 - Disabled automatic MCP Registry publishing for this maintained package.
 - Pinned the documented install examples to this package version.
+- Added `runtime-lock.json` with exact runtime dependency versions, activation markers, artifact URLs, and SHA-256 hashes (34 packages; 552 artifacts).
+- Added `scripts/generate_runtime_lock.py` to regenerate and verify the runtime manifest from `uv.lock`.
+- Added `scripts/start_server.py` to invoke the pinned distribution with repeated stable `uvx --with` pins.
 - No changes to the upstream Excel engine implementation have been made in this preparation baseline.
 
 **Status:** preparation only; not yet published to PyPI. Runtime dependency pinning, package build verification, clean-install tests, and release credentials remain outstanding.
