@@ -43,7 +43,8 @@ jobs:
         run: |
           $destination = Join-Path $env:RUNNER_TEMP "excel-workbook-assistant-lite"
           Expand-Archive -Path "dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip" -DestinationPath $destination -Force
-          python scripts/test_workbuddy_lightweight.py $destination
+          $skillRoot = Join-Path $destination "excel-workbook-assistant-lite"
+          python scripts/test_workbuddy_lightweight.py $skillRoot
 
       - name: Report package size and checksum
         shell: pwsh
