@@ -14,6 +14,9 @@ This file records changes specific to the maintained distribution. See the upstr
 - Added `runtime-lock.json` with exact runtime dependency versions, activation markers, artifact URLs, and SHA-256 hashes (34 packages; 552 artifacts).
 - Added `scripts/generate_runtime_lock.py` to regenerate and verify the runtime manifest from `uv.lock`.
 - Added `scripts/start_server.py` to invoke the pinned distribution with repeated stable `uvx --with` pins.
+- Added `scripts/build_wheelhouse.py` to select platform-compatible wheels and verify each downloaded artifact against its locked SHA-256 and file size.
+- Added a manually triggered Windows CPython 3.13 workflow that tests installation in offline/no-index mode and publishes the verified wheelhouse to a GitHub prerelease.
+- Guarded the PyPI publisher so runtime-backup prereleases cannot accidentally trigger a PyPI publication.
 - Adapted `src/excel_mcp/__init__.py` to recognize the maintained distribution metadata first, with a fallback to the original upstream distribution name. This preserves upstream use while allowing the renamed package to start.
 - Added regression tests for maintained metadata, upstream fallback, and missing metadata.
 
