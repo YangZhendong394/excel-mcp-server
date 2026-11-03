@@ -40,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: release
-      url: https://pypi.org/project/excel-mcp-server
+      url: https://pypi.org/project/yangzhendong394-excel-mcp-server
     permissions:
       id-token: write
     steps:
@@ -66,28 +66,3 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name }}
         run: gh release upload "$TAG" dist/* --repo "$GITHUB_REPOSITORY"
-
-  mcp-registry:
-    needs: pypi
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - name: Install mcp-publisher
-        run: >-
-          curl -fsSL
-          https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz
-          | tar xz mcp-publisher
-      - name: Publish to the MCP Registry
-        # PyPI can take a minute to show a new version, and the registry checks it.
-        run: |
-          ./mcp-publisher login github-oidc
-          for attempt in 1 2 3 4 5; do
-            ./mcp-publisher publish && exit 0
-            sleep 30
-          done
-          exit 1
