@@ -8,6 +8,7 @@ Usage:
 The bridge starts the local, hash-verified runtime launcher, performs an MCP
 handshake, invokes one tool, prints a JSON result, and shuts the server down.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -72,10 +73,19 @@ def load_arguments(args: argparse.Namespace) -> dict[str, Any]:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--allow-dir", required=True, type=Path, help="Folder containing the Excel files this task may access.")
-    parser.add_argument("--timeout", type=int, default=180, help="Seconds to wait for the server and tool response.")
+    parser.add_argument(
+        "--allow-dir",
+        required=True,
+        type=Path,
+        help="Folder containing the Excel files this task may access.",
+    )
+    parser.add_argument(
+        "--timeout", type=int, default=180, help="Seconds to wait for the server and tool response."
+    )
     subparsers = parser.add_subparsers(dest="action", required=True)
-    subparsers.add_parser("list-tools", help="Show the available Excel MCP tools and their input schemas.")
+    subparsers.add_parser(
+        "list-tools", help="Show the available Excel MCP tools and their input schemas."
+    )
     call_parser = subparsers.add_parser("call-tool", help="Call one Excel MCP tool.")
     call_parser.add_argument("tool_name")
     arg_group = call_parser.add_mutually_exclusive_group()
