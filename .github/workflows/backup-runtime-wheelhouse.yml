@@ -1,6 +1,16 @@
 name: Build runtime wheelhouse backup
 
 on:
+  push:
+    branches:
+      - workbuddy-adaptation
+    paths:
+      - ".github/workflows/backup-runtime-wheelhouse.yml"
+      - "scripts/build_wheelhouse.py"
+      - "scripts/start_server.py"
+      - "runtime-lock.json"
+      - "pyproject.toml"
+      - "uv.lock"
   workflow_dispatch:
 
 permissions: {}
