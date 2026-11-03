@@ -11,8 +11,10 @@ All notable changes to this project are documented here. The format follows
 ### Changed
 
 - Added the maintained WorkBuddy distribution metadata and a reproducible runtime dependency lock.
-- Added a GitHub-hosted Windows CPython 3.13 wheelhouse with SHA-256 verification and offline
-  installation testing. The Excel processing engine remains based on upstream 2.2.6.
+- Added a GitHub-hosted Windows x64 / CPython 3.13 wheelhouse with SHA-256 verification.
+- Updated the WorkBuddy launcher to cache the release wheelhouse and install offline, without
+  falling back to PyPI. Added an end-to-end MCP initialization and tools-list smoke test.
+- The Excel processing engine remains based on upstream 2.2.6.
 
 
 ## [2.2.6] - 2026-11-01

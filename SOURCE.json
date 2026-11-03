@@ -24,12 +24,12 @@
       "Independent PyPI distribution identity",
       "WorkBuddy-oriented packaging metadata and documentation",
       "Separate release workflow identity",
-      "Future dependency and runtime hardening",
       "Exact runtime dependency lock with artifact URLs and SHA-256 hashes",
       "Version metadata compatibility for the maintained PyPI distribution name",
-      "Platform-specific GitHub Release wheelhouse backups with SHA-256 verification and offline install testing"
+      "Platform-specific GitHub Release wheelhouse backups with SHA-256 verification and offline install testing",
+      "WorkBuddy launcher using a locally cached, hash-verified GitHub Release wheelhouse and offline installation"
     ],
     "core_engine": "The upstream Excel processing behavior is retained. The package initializer was adapted to read this maintained distribution's version metadata first and fall back to the original upstream distribution name when used from an upstream installation."
   },
-  "status": "Preparation only; this version has not yet been published to PyPI."
+  "status": "Not yet published to PyPI. A hash-verified Windows x64 / CPython 3.13 runtime wheelhouse is published as a GitHub prerelease. Other operating system and Python-version wheelhouses remain to be built and tested."
 }

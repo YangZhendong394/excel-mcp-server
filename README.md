@@ -153,17 +153,23 @@ on macOS). Use its full path instead, which `which uvx` prints.
 
 ## Reproducible WorkBuddy runtime
 
-This maintained distribution includes `runtime-lock.json`, generated from `uv.lock`. It records the exact versions of all 34 runtime dependencies and the locked artifact URLs and SHA-256 hashes for 552 platform-specific source/wheel files.
+This maintained distribution includes `runtime-lock.json`, generated from `uv.lock`. It records exact dependency versions and locked artifact URLs and SHA-256 hashes.
 
-For a local checkout, the pinned launcher is:
+For a local WorkBuddy Skill checkout on **Windows x64 with CPython 3.13**, start the server with:
 
-```bash
-python scripts/start_server.py stdio
+```powershell
+python scripts/start_server.py stdio --allow-dir C:\Workbooks
 ```
 
-The launcher selects dependencies for the current platform and passes exact versions to `uvx` with repeated `--with package==version` options, then starts the pinned distribution. The first launch may download packages from the configured Python package index; later launches reuse uv's cache. To inspect the command without downloading anything, run `python scripts/start_server.py --show-command`.
+The launcher downloads the matching runtime wheelhouse from this repository's GitHub Release, verifies the archive checksum, then verifies every dependency wheel against `runtime-lock.json`. It caches the verified files under `%LOCALAPPDATA%\WorkBuddy\excel-mcp-server\` and starts `excel-mcp-server` using uv in offline, no-index mode. The first launch downloads about 22.3 MB; later launches reuse the cache. The launcher does not fall back to PyPI.
 
-The artifact URLs and hashes are an inventory for the planned backup wheelhouse. **They are not yet a private mirror**: package downloads still come from the configured package index. We will build and test the GitHub-hosted backup before describing the installation as independent of PyPI.
+**Current backup coverage:** Windows x64 / CPython 3.13. Other operating systems and Python versions need their own wheelhouse Release before this launcher can start there; it reports a clear error rather than silently downloading from PyPI.
+
+To inspect the selected runtime command without downloading anything, run:
+
+```bash
+python scripts/start_server.py --show-command
+```
 
 To verify that the runtime manifest still matches the lockfile:
 
