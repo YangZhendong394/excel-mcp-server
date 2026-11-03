@@ -4,6 +4,7 @@
 Only the best compatible prebuilt wheel for each runtime dependency is
 downloaded. Dependencies are never built from source distributions.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -53,9 +54,7 @@ def choose_wheel(package: dict[str, Any], supported_tags: dict) -> dict[str, Any
         try:
             _name, _version, _build, wheel_tags = parse_wheel_filename(filename)
         except Exception as exc:
-            raise ValueError(
-                f"Cannot parse locked wheel name {filename!r}: {exc}"
-            ) from exc
+            raise ValueError(f"Cannot parse locked wheel name {filename!r}: {exc}") from exc
 
         matching = [tag for tag in wheel_tags if tag in supported_tags]
         if matching:
@@ -98,9 +97,7 @@ def download_verified(
         except (OSError, urllib.error.URLError) as exc:
             target.unlink(missing_ok=True)
             if attempt == 2:
-                raise RuntimeError(
-                    f"Download failed for {filename}: {exc}"
-                ) from exc
+                raise RuntimeError(f"Download failed for {filename}: {exc}") from exc
             time.sleep(2**attempt)
 
     actual_hash = sha256_file(target)
@@ -108,8 +105,7 @@ def download_verified(
     if actual_hash != expected_hash:
         target.unlink(missing_ok=True)
         raise RuntimeError(
-            f"SHA-256 mismatch for {filename}: "
-            f"expected {expected_hash}, got {actual_hash}"
+            f"SHA-256 mismatch for {filename}: expected {expected_hash}, got {actual_hash}"
         )
 
     actual_size = target.stat().st_size
@@ -117,8 +113,7 @@ def download_verified(
     if expected_size is not None and actual_size != expected_size:
         target.unlink(missing_ok=True)
         raise RuntimeError(
-            f"Size mismatch for {filename}: "
-            f"expected {expected_size}, got {actual_size}"
+            f"Size mismatch for {filename}: expected {expected_size}, got {actual_size}"
         )
 
     return {
@@ -145,14 +140,9 @@ def select_runtime_wheels(lock: dict[str, Any]) -> list[tuple[dict, dict]]:
         "implementation_name": sys.implementation.name,
     }
     packages = [
-        package
-        for package in lock["packages"]
-        if package_is_applicable(package, environment)
+        package for package in lock["packages"] if package_is_applicable(package, environment)
     ]
-    return [
-        (package, choose_wheel(package, supported_tags))
-        for package in packages
-    ]
+    return [(package, choose_wheel(package, supported_tags)) for package in packages]
 
 
 def find_project_wheel(
@@ -198,8 +188,7 @@ def main() -> int:
         print(f"dependency_count={len(choices)}")
         for package, artifact in choices:
             print(
-                f"{package['name']}=={package['version']} -> "
-                f"{filename_from_url(artifact['url'])}"
+                f"{package['name']}=={package['version']} -> {filename_from_url(artifact['url'])}"
             )
         return 0
 
@@ -216,9 +205,7 @@ def main() -> int:
         temp_dir = Path(temp_name)
         for package, artifact in choices:
             record = download_verified(artifact, temp_dir)
-            record.update(
-                {"package": package["name"], "version": package["version"]}
-            )
+            record.update({"package": package["name"], "version": package["version"]})
             manifest_files.append(record)
             print(
                 f"VERIFIED {package['name']}=={package['version']}",
@@ -283,8 +270,7 @@ def main() -> int:
     }.get(raw_machine, raw_machine)
     python_tag = f"cp{sys.version_info.major}{sys.version_info.minor}"
     archive_name = (
-        f"wheelhouse-{system}-{machine}-{python_tag}-"
-        f"{lock['distribution']['version']}.zip"
+        f"wheelhouse-{system}-{machine}-{python_tag}-{lock['distribution']['version']}.zip"
     )
     archive_path = output_dir.parent / archive_name
     if archive_path.exists():
