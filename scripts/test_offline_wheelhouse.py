@@ -8,20 +8,18 @@ cache so a successful run proves the wheelhouse is self-contained.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import os
 import queue
 import shutil
 import subprocess
-import sys
 import tempfile
 import threading
 import time
 from pathlib import Path
 from typing import Any
-
 from start_server import build_command, ensure_wheelhouse
-
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "runtime-lock.json"
@@ -41,7 +39,7 @@ def read_response(
             if process.poll() is not None:
                 raise RuntimeError(
                     f"Server exited before response {message_id}; exit code={process.returncode}"
-                )
+                ) from None
             continue
 
         try:
@@ -182,7 +180,7 @@ def main() -> int:
                 raise RuntimeError(f"tools/list error: {result['error']}")
 
             tools = result.get("result", {}).get("tools", [])
-            print(f"tools_list=OK", flush=True)
+            print("tools_list=OK", flush=True)
             print(f"tool_count={len(tools)}", flush=True)
             if len(tools) < 40:
                 raise RuntimeError(f"Expected at least 40 Excel tools; received {len(tools)}")
@@ -201,10 +199,8 @@ def main() -> int:
                 process.terminate()
                 process.wait(timeout=8)
             except Exception:
-                try:
+                with contextlib.suppress(Exception):
                     process.kill()
-                except Exception:
-                    pass
 
 
 if __name__ == "__main__":

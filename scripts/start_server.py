@@ -24,7 +24,6 @@ import zipfile
 from pathlib import Path, PurePosixPath
 from typing import Any
 
-
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "runtime-lock.json"
 REPOSITORY = "YangZhendong394/excel-mcp-server"
@@ -274,9 +273,11 @@ def download_file(url: str, destination: Path) -> None:
         headers={"User-Agent": "WorkBuddy-Excel-MCP-Launcher/1.0"},
     )
     try:
-        with urllib.request.urlopen(request, timeout=120) as response:
-            with destination.open("wb") as output:
-                shutil.copyfileobj(response, output, length=1024 * 1024)
+        with (
+            urllib.request.urlopen(request, timeout=120) as response,
+            destination.open("wb") as output,
+        ):
+            shutil.copyfileobj(response, output, length=1024 * 1024)
     except urllib.error.HTTPError as exc:
         if exc.code == 404:
             raise RuntimeError(
@@ -380,10 +381,6 @@ def build_command(
 
 
 def main() -> int:
-    if sys.version_info < (3, 11):
-        print("Excel MCP Server requires Python 3.11 or newer.", file=sys.stderr, flush=True)
-        return 2
-
     if not LOCK_PATH.is_file():
         print(f"Runtime lock not found: {LOCK_PATH}", file=sys.stderr, flush=True)
         return 2

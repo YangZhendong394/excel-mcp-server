@@ -23,9 +23,7 @@ from typing import Any
 
 from pip._vendor.packaging.tags import sys_tags
 from pip._vendor.packaging.utils import parse_wheel_filename
-
 from start_server import package_is_applicable
-
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "runtime-lock.json"
@@ -174,9 +172,6 @@ def main() -> int:
         help="select compatible locked wheels without downloading or writing files",
     )
     args = parser.parse_args()
-
-    if sys.version_info < (3, 11):
-        raise RuntimeError("The wheelhouse builder requires Python 3.11 or newer.")
 
     lock = load_lock()
     choices = select_runtime_wheels(lock)
