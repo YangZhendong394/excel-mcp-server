@@ -9,6 +9,9 @@ on:
       - "scripts/build_wheelhouse.py"
       - "scripts/start_server.py"
       - "scripts/test_offline_wheelhouse.py"
+      - "scripts/test_workbuddy_skill.py"
+      - "scripts/package_workbuddy_skill.py"
+      - "workbuddy-skill/**"
       - "runtime-lock.json"
       - "pyproject.toml"
       - "uv.lock"
@@ -113,3 +116,21 @@ jobs:
 
       - name: Test the published backup through the offline WorkBuddy launcher
         run: uv run python scripts/test_offline_wheelhouse.py --github-release
+
+      - name: Test the packaged WorkBuddy Skill against a real workbook
+        run: uv run python scripts/test_workbuddy_skill.py
+
+      - name: Package the uploadable WorkBuddy Skill
+        run: uv run python scripts/package_workbuddy_skill.py
+
+      - name: Upload the WorkBuddy Skill ZIP and checksum to the runtime release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          RELEASE_TAG: runtime-windows-amd64-cp313-2.2.6.post1
+        run: |
+          gh release upload "$RELEASE_TAG" \
+            dist/excel-workbook-assistant-1.0.0.zip \
+            dist/excel-workbook-assistant-1.0.0.zip.sha256 \
+            --clobber --repo "$REPOSITORY"
