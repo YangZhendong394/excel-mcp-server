@@ -151,6 +151,26 @@ JSON above to `claude_desktop_config.json`, and restart Claude.
 Desktop apps often cannot find `uvx`, because they do not see your shell's `PATH` (common
 on macOS). Use its full path instead, which `which uvx` prints.
 
+## Reproducible WorkBuddy runtime
+
+This maintained distribution includes `runtime-lock.json`, generated from `uv.lock`. It records the exact versions of all 34 runtime dependencies and the locked artifact URLs and SHA-256 hashes for 552 platform-specific source/wheel files.
+
+For a local checkout, the pinned launcher is:
+
+```bash
+python scripts/start_server.py stdio
+```
+
+The launcher selects dependencies for the current platform and passes exact versions to `uvx` with repeated `--with package==version` options, then starts the pinned distribution. The first launch may download packages from the configured Python package index; later launches reuse uv's cache. To inspect the command without downloading anything, run `python scripts/start_server.py --show-command`.
+
+The artifact URLs and hashes are an inventory for the planned backup wheelhouse. **They are not yet a private mirror**: package downloads still come from the configured package index. We will build and test the GitHub-hosted backup before describing the installation as independent of PyPI.
+
+To verify that the runtime manifest still matches the lockfile:
+
+```bash
+python scripts/generate_runtime_lock.py --check
+```
+
 ## Choosing which files it can use
 
 With `--allow-dir DIR`, the server only opens workbooks inside `DIR` (subfolders included)
