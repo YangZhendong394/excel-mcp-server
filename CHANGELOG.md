@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.2.6.post1] - 2026-11-03
+
+### Changed
+
+- Added the maintained WorkBuddy distribution metadata and a reproducible runtime dependency lock.
+- Added a GitHub-hosted Windows CPython 3.13 wheelhouse with SHA-256 verification and offline
+  installation testing. The Excel processing engine remains based on upstream 2.2.6.
+
+
 ## [2.2.6] - 2026-11-01
 
 ### Fixed
