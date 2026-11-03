@@ -7,7 +7,6 @@ All server protocol traffic is inherited unchanged; diagnostics go to stderr.
 from __future__ import annotations
 
 import json
-import os
 import platform
 import re
 import shutil
