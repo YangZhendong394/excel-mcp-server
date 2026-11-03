@@ -19,6 +19,13 @@ from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+# WorkBuddy runs on Windows for the current product target. Force UTF-8 JSON output
+# so Chinese worksheet names and cell values are never lost on legacy console code pages.
+for _stream in (sys.stdout, sys.stderr):
+    reconfigure = getattr(_stream, "reconfigure", None)
+    if reconfigure is not None:
+        reconfigure(encoding="utf-8", errors="replace")
+
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 VENDOR_DIR = SKILL_ROOT / "vendor"
 if VENDOR_DIR.is_dir():
