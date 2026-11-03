@@ -1,0 +1,62 @@
+name: WorkBuddy Lightweight Skill
+
+on:
+  push:
+    branches:
+      - workbuddy-lightweight
+    paths:
+      - "workbuddy-skill/excel-workbook-assistant-lite/**"
+      - "scripts/package_workbuddy_lightweight.py"
+      - "scripts/test_workbuddy_lightweight.py"
+      - ".github/workflows/workbuddy-lightweight.yml"
+  pull_request:
+    branches:
+      - workbuddy-lightweight
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned pure-Python dependencies into a temporary vendor folder
+        run: |
+          python -m pip install --disable-pip-version-check --no-compile --target build/vendor "openpyxl==3.1.5" "et-xmlfile==2.0.0"
+
+      - name: Build self-contained Skill ZIP
+        run: |
+          python scripts/package_workbuddy_lightweight.py --vendor-dir build/vendor --output dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip
+
+      - name: Extract and test the exact ZIP that will be distributed
+        shell: pwsh
+        run: |
+          $destination = Join-Path $env:RUNNER_TEMP "excel-workbook-assistant-lite"
+          Expand-Archive -Path "dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip" -DestinationPath $destination -Force
+          python scripts/test_workbuddy_lightweight.py $destination
+
+      - name: Report package size and checksum
+        shell: pwsh
+        run: |
+          $file = Get-Item "dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip"
+          $hash = (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLower()
+          Write-Host "SKILL_ZIP_BYTES=$($file.Length)"
+          Write-Host "SKILL_ZIP_SHA256=$hash"
+
+      - name: Upload test package
+        uses: actions/upload-artifact@v4
+        with:
+          name: excel-workbook-assistant-lite-2.0.0-alpha.1
+          path: dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip
+          if-no-files-found: error
+          retention-days: 30
