@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.haris-musa/excel-mcp-server",
-  "title": "Excel MCP Server",
-  "description": "Create and edit Excel files with AI: charts, PivotTables, formulas. No Excel needed.",
+  "name": "io.github.yangzhendong394/excel-mcp-server",
+  "title": "Excel MCP Server — WorkBuddy-maintained fork",
+  "description": "WorkBuddy-maintained distribution of the open-source Excel MCP Server for local Excel workbook operations.",
   "repository": {
-    "url": "https://github.com/haris-musa/excel-mcp-server",
+    "url": "https://github.com/YangZhendong394/excel-mcp-server",
     "source": "github"
   },
-  "version": "2.2.6",
+  "version": "2.2.6.post1",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
-      "identifier": "excel-mcp-server",
+      "identifier": "yangzhendong394-excel-mcp-server",
       "version": "2.2.6",
       "runtimeHint": "uvx",
       "transport": {
