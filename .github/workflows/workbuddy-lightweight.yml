@@ -23,10 +23,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python 3.13
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
 
@@ -55,7 +55,7 @@ jobs:
           Write-Host "SKILL_ZIP_SHA256=$hash"
 
       - name: Upload test package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: excel-workbook-assistant-lite-2.0.0-alpha.1
           path: dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip
