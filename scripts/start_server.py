@@ -5,6 +5,7 @@ The wheelhouse is downloaded once, verified against its release checksum and
 runtime-lock.json, then cached locally. The actual uvx install is offline.
 All server protocol traffic is inherited unchanged; diagnostics go to stderr.
 """
+
 from __future__ import annotations
 
 import hashlib
@@ -81,10 +82,7 @@ def marker_matches(expression: str, environment: dict[str, str]) -> bool:
 
 def package_is_applicable(package: dict, environment: dict[str, str]) -> bool:
     paths = package.get("activation_paths", [[]])
-    return any(
-        all(marker_matches(marker, environment) for marker in path)
-        for path in paths
-    )
+    return any(all(marker_matches(marker, environment) for marker in path) for path in paths)
 
 
 def current_environment() -> dict[str, str]:
@@ -172,7 +170,7 @@ def verify_wheelhouse(directory: Path, lock: dict[str, Any]) -> None:
     if manifest.get("distribution", {}).get("version") != distribution["version"]:
         raise RuntimeError("The runtime backup package version does not match the skill.")
 
-    system, machine, _python_tag = platform_identity()
+    _system, machine, _python_tag = platform_identity()
     manifest_platform = manifest.get("platform", {})
     if manifest_platform.get("sys_platform") != sys.platform:
         raise RuntimeError("The runtime backup was built for a different operating system.")
@@ -303,7 +301,9 @@ def extract_archive_safely(archive_path: Path, destination: Path) -> None:
                 raise RuntimeError(f"Unsafe path in runtime backup: {info.filename}")
             mode = (info.external_attr >> 16) & 0o170000
             if mode == stat.S_IFLNK:
-                raise RuntimeError(f"Symbolic links are not allowed in runtime backup: {info.filename}")
+                raise RuntimeError(
+                    f"Symbolic links are not allowed in runtime backup: {info.filename}"
+                )
             target = destination / member.name
             with archive.open(info) as source, target.open("xb") as output:
                 shutil.copyfileobj(source, output, length=1024 * 1024)
@@ -365,6 +365,8 @@ def build_command(
         uvx,
         "--offline",
         "--no-index",
+        "--no-build",
+        "--no-python-downloads",
         "--find-links",
         str(wheelhouse),
         "--from",
@@ -386,7 +388,11 @@ def main() -> int:
 
     uvx = shutil.which("uvx")
     if not uvx:
-        print("uvx was not found in PATH; WorkBuddy's uv installation is required.", file=sys.stderr, flush=True)
+        print(
+            "uvx was not found in PATH; WorkBuddy's uv installation is required.",
+            file=sys.stderr,
+            flush=True,
+        )
         return 2
 
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
@@ -428,7 +434,11 @@ def main() -> int:
         wheelhouse = ensure_wheelhouse(lock)
         command, selected = build_command(lock, uvx, wheelhouse, args)
     except (OSError, ValueError, KeyError, TypeError, RuntimeError, zipfile.BadZipFile) as exc:
-        print(f"Excel MCP Server could not prepare its verified runtime: {exc}", file=sys.stderr, flush=True)
+        print(
+            f"Excel MCP Server could not prepare its verified runtime: {exc}",
+            file=sys.stderr,
+            flush=True,
+        )
         return 2
 
     print(
