@@ -108,7 +108,19 @@ def main() -> int:
         with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
             for path in sorted(stage.rglob("*")):
                 if path.is_file():
-                    archive.write(path, path.relative_to(stage).as_posix())
+                    archive.write(
+                        path,
+                        f"{PACKAGE_NAME}/{path.relative_to(stage).as_posix()}",
+                    )
+
+        with zipfile.ZipFile(output) as archive:
+            expected = {
+                f"{PACKAGE_NAME}/{path.relative_to(stage).as_posix()}"
+                for path in stage.rglob("*")
+                if path.is_file()
+            }
+            if set(archive.namelist()) != expected:
+                raise RuntimeError("Skill ZIP content or top-level folder structure check failed.")
 
         size = output.stat().st_size
         if size >= MAX_ZIP_BYTES:
