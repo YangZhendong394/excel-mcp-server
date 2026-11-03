@@ -70,7 +70,11 @@ def main() -> int:
     if not uvx:
         raise RuntimeError("uvx was not found in PATH")
 
-    with tempfile.TemporaryDirectory(prefix="excel-mcp-offline-uv-cache-") as cache:
+    # Windows may briefly keep imported .pyd files locked after the child exits.
+    # Ignore cleanup-only errors; the hosted runner removes its temp directory at job end.
+    with tempfile.TemporaryDirectory(
+        prefix="excel-mcp-offline-uv-cache-", ignore_cleanup_errors=True
+    ) as cache:
         env = os.environ.copy()
         env["UV_CACHE_DIR"] = cache
         env["UV_OFFLINE"] = "1"
