@@ -86,7 +86,7 @@ jobs:
           archive = archives[0]
           digest = hashlib.sha256(archive.read_bytes()).hexdigest()
           checksum = Path(str(archive) + ".sha256")
-          checksum.write_text(f"{digest}  {archive.name}\\n", encoding="utf-8")
+          checksum.write_text(f"{digest}  {archive.name}\n", encoding="utf-8")
           print(f"archive={archive}")
           print(f"archive_size_bytes={archive.stat().st_size}")
           print(f"archive_sha256={digest}")
@@ -99,7 +99,7 @@ jobs:
           REPOSITORY: ${{ github.repository }}
           TARGET_SHA: ${{ github.sha }}
         run: |
-          ARCHIVE=$(printf '%s\\n' dist/wheelhouse-windows-amd64-cp313-*.zip)
+          ARCHIVE=$(printf '%s\n' dist/wheelhouse-windows-amd64-cp313-*.zip)
           CHECKSUM="$ARCHIVE.sha256"
           if gh release view "$RELEASE_TAG" --repo "$REPOSITORY" >/dev/null 2>&1; then
             gh release upload "$RELEASE_TAG" "$ARCHIVE" "$CHECKSUM" --clobber --repo "$REPOSITORY"
