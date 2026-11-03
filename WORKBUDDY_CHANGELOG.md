@@ -14,6 +14,7 @@ This file records changes specific to the maintained distribution. See the upstr
 - Added `runtime-lock.json` with exact runtime dependency versions, activation markers, artifact URLs, and SHA-256 hashes (34 packages; 552 artifacts).
 - Added `scripts/generate_runtime_lock.py` to regenerate and verify the runtime manifest from `uv.lock`.
 - Added `scripts/start_server.py` to invoke the pinned distribution with repeated stable `uvx --with` pins.
-- No changes to the upstream Excel engine implementation have been made in this preparation baseline.
+- Adapted `src/excel_mcp/__init__.py` to recognize the maintained distribution metadata first, with a fallback to the original upstream distribution name. This preserves upstream use while allowing the renamed package to start.
+- Added regression tests for maintained metadata, upstream fallback, and missing metadata.
 
 **Status:** preparation only; not yet published to PyPI. Runtime dependency pinning, package build verification, clean-install tests, and release credentials remain outstanding.
