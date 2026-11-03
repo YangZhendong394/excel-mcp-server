@@ -5,7 +5,7 @@
   "display_name": "Excel MCP Server for WorkBuddy",
   "version": "2.2.6.post1",
   "description": "Create, read and edit Excel workbooks without Microsoft Excel",
-  "long_description": "Work with .xlsx and .xlsm files: read and write cells, formulas and dates, format ranges, add tables, charts, conditional formats and data validation, and inspect VBA macro code. Access is limited to the folder you choose, and formulas that reach the network or other programs are blocked.",
+  "long_description": "Work with .xlsx and .xlsm files: read and write cells, formulas and dates, format ranges, add tables, charts, conditional formats and data validation, and inspect VBA macro code. Access is limited to the folder you choose, and formulas that reach the network or other programs are blocked. Maintained by 没皮没脸; based on Haris Musa's upstream MIT-licensed project with original copyright and license retained.",
   "author": {
     "name": "没皮没脸",
     "url": "https://github.com/YangZhendong394"
@@ -15,7 +15,7 @@
     "url": "https://github.com/YangZhendong394/excel-mcp-server"
   },
   "homepage": "https://github.com/YangZhendong394/excel-mcp-server",
-  "documentation": "https://github.com/YangZhendong394/excel-mcp-server/blob/main/TOOLS.md",
+  "documentation": "https://github.com/YangZhendong394/excel-mcp-server/blob/workbuddy-adaptation/TOOLS.md",
   "support": "https://github.com/YangZhendong394/excel-mcp-server/issues",
   "icon": "icon.png",
   "license": "MIT",
