@@ -24,7 +24,8 @@
       "Independent PyPI distribution identity",
       "WorkBuddy-oriented packaging metadata and documentation",
       "Separate release workflow identity",
-      "Future dependency and runtime hardening"
+      "Future dependency and runtime hardening",
+      "Exact runtime dependency lock with artifact URLs and SHA-256 hashes"
     ],
     "core_engine": "At this baseline, core engine source is inherited unchanged from the upstream commit listed above."
   },
