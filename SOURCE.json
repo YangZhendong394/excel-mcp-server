@@ -1,0 +1,32 @@
+{
+  "distribution": {
+    "display_name": "Excel MCP Server for WorkBuddy",
+    "pypi_name": "yangzhendong394-excel-mcp-server",
+    "version": "2.2.6.post1",
+    "console_command": "excel-mcp-server",
+    "maintainer": "没皮没脸",
+    "maintainer_github": "https://github.com/YangZhendong394"
+  },
+  "upstream": {
+    "repository": "https://github.com/haris-musa/excel-mcp-server",
+    "version": "2.2.6",
+    "commit": "7cc548b6a607c2441884db61205e4aac55642c58",
+    "license": "MIT",
+    "copyright": "Copyright (c) 2025-2026 Haris Musa"
+  },
+  "license_policy": {
+    "license_file": "LICENSE",
+    "notice": "The original upstream MIT License and copyright notice must be retained in source and binary redistributions."
+  },
+  "adaptation": {
+    "type": "maintained fork distribution",
+    "initial_scope": [
+      "Independent PyPI distribution identity",
+      "WorkBuddy-oriented packaging metadata and documentation",
+      "Separate release workflow identity",
+      "Future dependency and runtime hardening"
+    ],
+    "core_engine": "At this baseline, core engine source is inherited unchanged from the upstream commit listed above."
+  },
+  "status": "Preparation only; this version has not yet been published to PyPI."
+}
