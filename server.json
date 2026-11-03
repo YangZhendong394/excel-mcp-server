@@ -13,7 +13,7 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "yangzhendong394-excel-mcp-server",
-      "version": "2.2.6",
+      "version": "2.2.6.post1",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
