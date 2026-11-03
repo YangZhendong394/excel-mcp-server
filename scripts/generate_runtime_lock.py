@@ -13,7 +13,6 @@ import sys
 import tomllib
 from pathlib import Path
 
-
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "uv.lock"
 PROJECT_PATH = ROOT / "pyproject.toml"
