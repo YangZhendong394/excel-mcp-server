@@ -26,7 +26,8 @@
       "Separate release workflow identity",
       "Future dependency and runtime hardening",
       "Exact runtime dependency lock with artifact URLs and SHA-256 hashes",
-      "Version metadata compatibility for the maintained PyPI distribution name"
+      "Version metadata compatibility for the maintained PyPI distribution name",
+      "Platform-specific GitHub Release wheelhouse backups with SHA-256 verification and offline install testing"
     ],
     "core_engine": "The upstream Excel processing behavior is retained. The package initializer was adapted to read this maintained distribution's version metadata first and fall back to the original upstream distribution name when used from an upstream installation."
   },
