@@ -16,7 +16,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "uv.lock"
 PROJECT_PATH = ROOT / "pyproject.toml"
-SOURCE_PATH = ROOT / "SOURCE.json"
 OUTPUT_PATH = ROOT / "runtime-lock.json"
 
 
@@ -130,7 +129,7 @@ def build_manifest() -> dict:
             "project_version": project_version,
             "purpose": (
                 "Exact runtime dependency pins and artifact SHA-256 records "
-                "for WorkBuddy's isolated engine launcher."
+                "for WorkBuddy's isolated uvx launcher."
             ),
         },
         "distribution": {
