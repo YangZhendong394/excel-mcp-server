@@ -1,11 +1,12 @@
 [project]
-name = "excel-mcp-server"
-version = "2.2.6"
-description = "MCP server for creating, reading and editing Excel workbooks without Microsoft Excel"
+name = "yangzhendong394-excel-mcp-server"
+version = "2.2.6.post1"
+description = "WorkBuddy-oriented maintained distribution of the open-source Excel MCP Server"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [{ name = "Haris Musa", email = "haris.musa@outlook.com" }]
+maintainers = [{ name = "没皮没脸" }]
 requires-python = ">=3.11"
 keywords = [
     "mcp",
@@ -24,6 +25,8 @@ keywords = [
     "ai",
     "claude",
     "cursor",
+    "workbuddy",
+    "maintained-fork",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -51,10 +54,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/haris-musa/excel-mcp-server"
-Documentation = "https://github.com/haris-musa/excel-mcp-server/blob/main/TOOLS.md"
-Changelog = "https://github.com/haris-musa/excel-mcp-server/blob/main/CHANGELOG.md"
-Issues = "https://github.com/haris-musa/excel-mcp-server/issues"
+Homepage = "https://github.com/YangZhendong394/excel-mcp-server"
+Documentation = "https://github.com/YangZhendong394/excel-mcp-server/blob/main/README.md"
+Changelog = "https://github.com/YangZhendong394/excel-mcp-server/blob/main/WORKBUDDY_CHANGELOG.md"
+Issues = "https://github.com/YangZhendong394/excel-mcp-server/issues"
+Upstream = "https://github.com/haris-musa/excel-mcp-server"
 
 [project.scripts]
 excel-mcp-server = "excel_mcp.cli:main"
