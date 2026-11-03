@@ -10,13 +10,11 @@
   <a href="https://pypi.org/project/yangzhendong394-excel-mcp-server/"><img src="https://img.shields.io/pypi/v/yangzhendong394-excel-mcp-server.svg" alt="PyPI version"></a>
   <a href="https://pypi.org/project/yangzhendong394-excel-mcp-server/"><img src="https://img.shields.io/pypi/pyversions/yangzhendong394-excel-mcp-server.svg" alt="Python versions"></a>
   <a href="https://pepy.tech/project/yangzhendong394-excel-mcp-server"><img src="https://static.pepy.tech/badge/excel-mcp-server" alt="Downloads"></a>
-  <a href="https://github.com/haris-musa/excel-mcp-server/actions/workflows/ci.yml"><img src="https://github.com/YangZhendong394/excel-mcp-server/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/YangZhendong394/excel-mcp-server/actions/workflows/ci.yml"><img src="https://github.com/YangZhendong394/excel-mcp-server/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
 </p>
 
-<p align="center">
-  <a href="https://trendshift.io/repositories/13975" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/13975" alt="haris-musa%2Fexcel-mcp-server | Trendshift" width="250" height="55"/></a>
-</p>
+
 
 # Excel MCP Server — WorkBuddy-maintained distribution
 
@@ -85,19 +83,17 @@ they are.
 
 ## Quick start
 
-You need [uv](https://docs.astral.sh/uv/getting-started/installation/). Every client runs the
-server with `uvx --from yangzhendong394-excel-mcp-server excel-mcp-server stdio`; replace `/path/to/workbooks` with the folder the
+You need [uv](https://docs.astral.sh/uv/getting-started/installation/). The examples below pin this maintained distribution to the tested package version. Every client runs the
+server with `uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server stdio`; replace `/path/to/workbooks` with the folder the
 server may use. [excelmcpserver.com](https://excelmcpserver.com) has the same steps with copy
 buttons and one-click install links for Cursor and VS Code.
 
-**Claude Desktop (Chat)**: download
-[`excel-mcp-server.mcpb`](https://github.com/haris-musa/excel-mcp-server/releases/latest/download/excel-mcp-server.mcpb)
-from the latest release and open it. Claude asks which folder the server may use.
+**Claude Desktop (Chat)**: the prebuilt MCP bundle linked by the upstream project is not this maintained distribution. To use this distribution, configure Claude with the `uvx --from` command shown below, or build the bundle from this repository.
 
 **Claude Code** (the CLI, and the Code tab in Claude Desktop):
 
 ```bash
-claude mcp add excel --scope user -- uvx --from yangzhendong394-excel-mcp-server excel-mcp-server stdio --allow-dir /path/to/workbooks
+claude mcp add excel --scope user -- uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server stdio --allow-dir /path/to/workbooks
 ```
 
 **Cursor** (`~/.cursor/mcp.json`), and most clients that use an `mcpServers` config:
@@ -107,7 +103,7 @@ claude mcp add excel --scope user -- uvx --from yangzhendong394-excel-mcp-server
   "mcpServers": {
     "excel": {
       "command": "uvx",
-      "args": ["--from", "yangzhendong394-excel-mcp-server", "excel-mcp-server", "stdio", "--allow-dir", "/path/to/workbooks"]
+      "args": ["--from", "yangzhendong394-excel-mcp-server==2.2.6.post1", "excel-mcp-server", "stdio", "--allow-dir", "/path/to/workbooks"]
     }
   }
 }
@@ -121,7 +117,7 @@ claude mcp add excel --scope user -- uvx --from yangzhendong394-excel-mcp-server
     "excel": {
       "type": "stdio",
       "command": "uvx",
-      "args": ["--from", "yangzhendong394-excel-mcp-server", "excel-mcp-server", "stdio", "--allow-dir", "${workspaceFolder}"]
+      "args": ["--from", "yangzhendong394-excel-mcp-server==2.2.6.post1", "excel-mcp-server", "stdio", "--allow-dir", "${workspaceFolder}"]
     }
   }
 }
@@ -133,19 +129,19 @@ claude mcp add excel --scope user -- uvx --from yangzhendong394-excel-mcp-server
 **OpenAI Codex** (CLI, IDE extension and app):
 
 ```bash
-codex mcp add excel -- uvx --from yangzhendong394-excel-mcp-server excel-mcp-server stdio --allow-dir /path/to/workbooks
+codex mcp add excel -- uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server stdio --allow-dir /path/to/workbooks
 ```
 
 **Gemini CLI**:
 
 ```bash
-gemini mcp add -s user excel uvx --from yangzhendong394-excel-mcp-server excel-mcp-server stdio --allow-dir /path/to/workbooks
+gemini mcp add -s user excel uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server stdio --allow-dir /path/to/workbooks
 ```
 
 **Devin Desktop**:
 
 ```bash
-devin mcp add -s user excel -- uvx --from yangzhendong394-excel-mcp-server excel-mcp-server stdio --allow-dir /path/to/workbooks
+devin mcp add -s user excel -- uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server stdio --allow-dir /path/to/workbooks
 ```
 
 **Claude Desktop, manual setup**: open Settings, Developer, Edit Config, add the `mcpServers`
@@ -169,7 +165,7 @@ only touches Excel files and never silently overwrites an existing workbook.
 ## Remote use (Streamable HTTP)
 
 ```bash
-uvx --from yangzhendong394-excel-mcp-server excel-mcp-server streamable-http --allow-dir /srv/workbooks
+uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server streamable-http --allow-dir /srv/workbooks
 ```
 
 Clients connect to `http://127.0.0.1:8017/mcp`. Workbooks live in the `--allow-dir` folder
@@ -179,7 +175,7 @@ server and the client.
 The server listens on localhost only. To accept other machines, set a token and a host:
 
 ```bash
-EXCEL_MCP_AUTH_TOKEN=change-me uvx --from yangzhendong394-excel-mcp-server excel-mcp-server streamable-http --host 0.0.0.0
+EXCEL_MCP_AUTH_TOKEN=change-me uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server streamable-http --host 0.0.0.0
 ```
 
 Clients then send `Authorization: Bearer change-me`. Put a TLS-terminating reverse proxy in
@@ -228,7 +224,7 @@ docker run -p 8017:8017 -v "$PWD/workbooks:/data" -e EXCEL_MCP_AUTH_TOKEN=change
 
 Every tool costs context in every request. `--tools` offers only the core tools
 (`describe_workbook`, `describe_sheet`, `read_range`) and the areas you list, for example
-`uvx --from yangzhendong394-excel-mcp-server excel-mcp-server stdio --tools data,charts`. It combines with `--read-only` (read-only tools
+`uvx --from "yangzhendong394-excel-mcp-server==2.2.6.post1" excel-mcp-server stdio --tools data,charts`. It combines with `--read-only` (read-only tools
 of the areas) and `--allow-vba-write` (which also needs the `vba` area). An unknown area stops the
 server at startup and lists the valid ones. The sizes are characters of tool descriptions and
 schemas, at about 3.5 characters per token:
