@@ -27,9 +27,12 @@
       "Exact runtime dependency lock with artifact URLs and SHA-256 hashes",
       "Version metadata compatibility for the maintained PyPI distribution name",
       "Platform-specific GitHub Release wheelhouse backups with SHA-256 verification and offline install testing",
-      "WorkBuddy launcher using a locally cached, hash-verified GitHub Release wheelhouse and offline installation"
+      "WorkBuddy launcher using a locally cached, hash-verified GitHub Release wheelhouse and offline installation",
+      "Regular WorkBuddy Skill package with SKILL.md, local MCP bridge, and runtime launcher",
+      "Automated end-to-end Skill test covering list-tools and local workbook create/write/read",
+      "Uploadable Skill ZIP published as a GitHub Release asset; package size is checked against the 3 MB limit"
     ],
     "core_engine": "The upstream Excel processing behavior is retained. The package initializer was adapted to read this maintained distribution's version metadata first and fall back to the original upstream distribution name when used from an upstream installation."
   },
-  "status": "Not yet published to PyPI. A hash-verified Windows x64 / CPython 3.13 runtime wheelhouse is published as a GitHub prerelease. Other operating system and Python-version wheelhouses remain to be built and tested."
+  "status": "Not published to PyPI. The regular WorkBuddy Skill ZIP and a hash-verified Windows x64 / CPython 3.13 runtime wheelhouse are published as GitHub Release assets and pass automated end-to-end tests. Final validation inside the user's own WorkBuddy desktop and additional operating-system/Python wheelhouses remain outstanding."
 }

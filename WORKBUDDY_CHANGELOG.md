@@ -2,6 +2,16 @@
 
 This file records changes specific to the maintained distribution. See the upstream [CHANGELOG.md](https://github.com/haris-musa/excel-mcp-server/blob/main/CHANGELOG.md) for the original engine's full history.
 
+## 1.0.0 — WorkBuddy Skill package
+
+- Added the regular WorkBuddy Skill folder `workbuddy-skill/excel-workbook-assistant/` with official YAML frontmatter, Chinese/English metadata, usage examples, local-file safety guidance, and upstream notices.
+- Added `scripts/excel_mcp_bridge.py`, a small Bash-invoked stdio MCP bridge for listing and calling the Excel tools.
+- Added a package builder that verifies the required file list and enforces the 3 MB ZIP limit.
+- Published `excel-workbook-assistant-1.0.0.zip` and its SHA-256 file as GitHub Release assets.
+- Added an end-to-end CI smoke test that loads the packaged Skill, lists 46 tools, creates a workbook, writes sample cells, and reads the values back.
+
+**Status:** the GitHub-hosted Windows x64 / CPython 3.13 Skill package and runtime backup have passed automated end-to-end tests. PyPI publication and a final installation test inside the user's own WorkBuddy desktop remain outstanding.
+
 ## 2.2.6.post1 — preparation baseline
 
 - Established the independent distribution name `yangzhendong394-excel-mcp-server`.

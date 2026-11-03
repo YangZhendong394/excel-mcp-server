@@ -151,6 +151,17 @@ JSON above to `claude_desktop_config.json`, and restart Claude.
 Desktop apps often cannot find `uvx`, because they do not see your shell's `PATH` (common
 on macOS). Use its full path instead, which `which uvx` prints.
 
+## WorkBuddy Skill package
+
+The uploadable ordinary WorkBuddy Skill ZIP is published as a GitHub Release asset:
+
+- [Download Excel Workbook Assistant 1.0.0](https://github.com/YangZhendong394/excel-mcp-server/releases/download/runtime-windows-amd64-cp313-2.2.6.post1/excel-workbook-assistant-1.0.0.zip)
+- [SHA-256 checksum](https://github.com/YangZhendong394/excel-mcp-server/releases/download/runtime-windows-amd64-cp313-2.2.6.post1/excel-workbook-assistant-1.0.0.zip.sha256)
+
+The ZIP is approximately 65 KB, well below WorkBuddy's 3 MB upload limit. It contains a regular `SKILL.md` and local scripts; it does not use a Connector. Its currently verified runtime coverage is Windows x64 / CPython 3.13. The first use downloads the approximately 22.3 MB runtime wheelhouse from this repository's GitHub Release, verifies it, and caches it locally.
+
+The maintained PyPI package has **not** yet been published. The Skill ZIP and runtime backup are GitHub prerelease assets, not a PyPI release.
+
 ## Reproducible WorkBuddy runtime
 
 This maintained distribution includes `runtime-lock.json`, generated from `uv.lock`. It records exact dependency versions and locked artifact URLs and SHA-256 hashes.
