@@ -71,7 +71,6 @@ def main() -> int:
         raise FileNotFoundError(LOCK_PATH)
 
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
-    distribution = lock["distribution"]
     uvx = shutil.which("uvx")
     if not uvx:
         raise RuntimeError("uvx was not found in PATH")
