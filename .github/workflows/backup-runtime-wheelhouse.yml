@@ -1,0 +1,100 @@
+name: Build runtime wheelhouse backup
+
+on:
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  build-wheelhouse:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    env:
+      PACKAGE_NAME: yangzhendong394-excel-mcp-server
+      PACKAGE_VERSION: 2.2.6.post1
+      RELEASE_TAG: runtime-windows-amd64-cp313-2.2.6.post1
+    steps:
+      - name: Check out the maintained source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: workbuddy-adaptation
+          persist-credentials: false
+
+      - name: Install uv and Python 3.13
+        uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          enable-cache: true
+          python-version: "3.13"
+
+      - name: Synchronize the locked project environment
+        run: uv sync --locked
+
+      - name: Build the maintained project wheel
+        run: uv build --wheel --out-dir dist
+
+      - name: Build a hash-verified Windows CPython 3.13 wheelhouse
+        run: uv run --with pip python scripts/build_wheelhouse.py
+
+      - name: Confirm the archive contains all required wheels
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("dist/wheelhouse/wheelhouse-manifest.json").read_text(encoding="utf-8"))
+          assert manifest["distribution"]["pypi_name"] == "yangzhendong394-excel-mcp-server"
+          assert manifest["distribution"]["version"] == "2.2.6.post1"
+          assert len(manifest["files"]) == 34, len(manifest["files"])
+          assert all(Path("dist/wheelhouse", item["filename"]).is_file() for item in manifest["files"])
+          print("WHEELHOUSE_CONTENT_CHECK=PASS")
+          print(f"dependency_wheels={len(manifest['files']) - 1}")
+          print(f"project_wheel={manifest['files'][-1]['filename']}")
+          PY
+
+      - name: Test a clean offline uv installation from the wheelhouse
+        shell: bash
+        env:
+          UV_OFFLINE: "1"
+          UV_NO_CACHE: "1"
+        run: |
+          uv tool run --no-index --find-links dist/wheelhouse \
+            --from "$PACKAGE_NAME==$PACKAGE_VERSION" \
+            excel-mcp-server --version
+
+      - name: Create archive checksum
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+
+          archives = list(Path("dist").glob("wheelhouse-windows-amd64-cp313-*.zip"))
+          assert len(archives) == 1, archives
+          archive = archives[0]
+          digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+          checksum = Path(str(archive) + ".sha256")
+          checksum.write_text(f"{digest}  {archive.name}\\n", encoding="utf-8")
+          print(f"archive={archive}")
+          print(f"archive_size_bytes={archive.stat().st_size}")
+          print(f"archive_sha256={digest}")
+          PY
+
+      - name: Publish the runtime backup as a GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          TARGET_SHA: ${{ github.sha }}
+        run: |
+          ARCHIVE=$(printf '%s\\n' dist/wheelhouse-windows-amd64-cp313-*.zip)
+          CHECKSUM="$ARCHIVE.sha256"
+          if gh release view "$RELEASE_TAG" --repo "$REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$ARCHIVE" "$CHECKSUM" --clobber --repo "$REPOSITORY"
+          else
+            gh release create "$RELEASE_TAG" "$ARCHIVE" "$CHECKSUM" \
+              --title "Runtime backup — Windows x64 / CPython 3.13 — $PACKAGE_VERSION" \
+              --notes "Hash-verified wheelhouse for the WorkBuddy-maintained Excel MCP Server. Contains the 33 runtime dependency wheels and the maintained project wheel. Built from runtime-lock.json and tested with uv in offline, no-index mode. This is a runtime backup prerelease, not a PyPI publication." \
+              --prerelease --target "$TARGET_SHA" --repo "$REPOSITORY"
+          fi
