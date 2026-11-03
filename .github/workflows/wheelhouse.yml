@@ -32,10 +32,7 @@ jobs:
       - run: uv build --wheel
       - run: uv run --with pip python scripts/build_wheelhouse.py --dist-dir dist --output-dir dist/wheelhouse
       - name: Install only from wheelhouse and verify MCP handshake
-        env:
-          UV_CACHE_DIR: ${{ runner.temp }}/uv-wheelhouse-offline-cache
-          UV_OFFLINE: "1"
-        run: uv run --with pip python scripts/test_offline_wheelhouse.py --wheelhouse dist/wheelhouse
+        run: uv run python scripts/test_offline_wheelhouse.py --wheelhouse dist/wheelhouse
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: workbuddy-wheelhouse-windows-amd64-cp313
