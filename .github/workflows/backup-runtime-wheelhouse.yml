@@ -50,7 +50,8 @@ jobs:
           assert all(Path("dist/wheelhouse", item["filename"]).is_file() for item in manifest["files"])
           print("WHEELHOUSE_CONTENT_CHECK=PASS")
           print(f"dependency_wheels={len(manifest['files']) - 1}")
-          print(f"project_wheel={manifest['files'][-1]['filename']}")
+          project_wheel = next(item["filename"] for item in manifest["files"] if item.get("source") == "built-from-this-repository")
+          print(f"project_wheel={project_wheel}")
           PY
 
       - name: Test a clean offline uv installation from the wheelhouse
