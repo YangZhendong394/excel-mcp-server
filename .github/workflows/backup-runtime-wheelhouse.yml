@@ -8,6 +8,7 @@ on:
       - ".github/workflows/backup-runtime-wheelhouse.yml"
       - "scripts/build_wheelhouse.py"
       - "scripts/start_server.py"
+      - "scripts/test_offline_wheelhouse.py"
       - "runtime-lock.json"
       - "pyproject.toml"
       - "uv.lock"
@@ -109,3 +110,6 @@ jobs:
               --notes "Hash-verified wheelhouse for the WorkBuddy-maintained Excel MCP Server. Contains the 33 runtime dependency wheels and the maintained project wheel. Built from runtime-lock.json and tested with uv in offline, no-index mode. This is a runtime backup prerelease, not a PyPI publication." \
               --prerelease --target "$TARGET_SHA" --repo "$REPOSITORY"
           fi
+
+      - name: Test the published backup through the offline WorkBuddy launcher
+        run: uv run python scripts/test_offline_wheelhouse.py --github-release
