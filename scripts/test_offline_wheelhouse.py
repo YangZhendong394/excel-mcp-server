@@ -20,6 +20,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from start_server import build_command, ensure_wheelhouse
+
 
 ROOT = Path(__file__).resolve().parents[1]
 LOCK_PATH = ROOT / "runtime-lock.json"
@@ -56,13 +58,17 @@ def read_response(
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--wheelhouse", type=Path, required=True)
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--wheelhouse", type=Path)
+    source.add_argument(
+        "--github-release",
+        action="store_true",
+        help="download and verify the published GitHub Release wheelhouse",
+    )
     args = parser.parse_args()
 
     if not LOCK_PATH.is_file():
         raise FileNotFoundError(LOCK_PATH)
-    if not args.wheelhouse.is_dir():
-        raise FileNotFoundError(args.wheelhouse)
 
     lock = json.loads(LOCK_PATH.read_text(encoding="utf-8"))
     distribution = lock["distribution"]
@@ -76,24 +82,31 @@ def main() -> int:
         prefix="excel-mcp-offline-uv-cache-", ignore_cleanup_errors=True
     ) as cache:
         env = os.environ.copy()
-        env["UV_CACHE_DIR"] = cache
+        env["UV_CACHE_DIR"] = str(Path(cache) / "uv-cache")
         env["UV_OFFLINE"] = "1"
-        command = [
-            uvx,
-            "--offline",
-            "--no-index",
-            "--no-build",
-            "--no-python-downloads",
-            "--find-links",
-            str(args.wheelhouse.resolve()),
-            "--from",
-            f"{distribution['pypi_name']}=={distribution['version']}",
-            distribution["console_command"],
-            "stdio",
-        ]
+
+        if args.github_release:
+            cache_variable = "LOCALAPPDATA" if os.name == "nt" else "XDG_CACHE_HOME"
+            previous_cache = os.environ.get(cache_variable)
+            os.environ[cache_variable] = str(Path(cache) / "launcher-cache")
+            try:
+                wheelhouse = ensure_wheelhouse(lock)
+            finally:
+                if previous_cache is None:
+                    os.environ.pop(cache_variable, None)
+                else:
+                    os.environ[cache_variable] = previous_cache
+            print("github_release_download_and_hash_verification=OK", flush=True)
+        else:
+            if args.wheelhouse is None or not args.wheelhouse.is_dir():
+                raise FileNotFoundError(args.wheelhouse)
+            wheelhouse = args.wheelhouse.resolve()
+
+        command, dependency_count = build_command(lock, uvx, wheelhouse, ["stdio"])
 
         print("=== OFFLINE WHEELHOUSE MCP TEST ===", flush=True)
-        print(f"wheelhouse={args.wheelhouse.resolve()}", flush=True)
+        print(f"wheelhouse={wheelhouse}", flush=True)
+        print(f"locked_dependency_count={dependency_count}", flush=True)
         print("registry_access=DISABLED", flush=True)
         print("uv_cache=FRESH", flush=True)
 
