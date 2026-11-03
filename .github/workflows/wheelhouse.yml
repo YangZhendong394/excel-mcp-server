@@ -11,6 +11,11 @@ on:
       - "scripts/build_wheelhouse.py"
       - "scripts/test_offline_wheelhouse.py"
       - ".github/workflows/wheelhouse.yml"
+      - "WORKBUDDY_CHANGELOG.md"
+      - "SOURCE.json"
+      - "README.md"
+      - "LICENSE"
+      - "src/**"
   release:
     types: [published]
 
