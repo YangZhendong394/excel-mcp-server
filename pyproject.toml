@@ -55,8 +55,8 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/YangZhendong394/excel-mcp-server"
-Documentation = "https://github.com/YangZhendong394/excel-mcp-server/blob/main/README.md"
-Changelog = "https://github.com/YangZhendong394/excel-mcp-server/blob/main/WORKBUDDY_CHANGELOG.md"
+Documentation = "https://github.com/YangZhendong394/excel-mcp-server/blob/workbuddy-adaptation/TOOLS.md"
+Changelog = "https://github.com/YangZhendong394/excel-mcp-server/blob/workbuddy-adaptation/WORKBUDDY_CHANGELOG.md"
 Issues = "https://github.com/YangZhendong394/excel-mcp-server/issues"
 Upstream = "https://github.com/haris-musa/excel-mcp-server"
 
