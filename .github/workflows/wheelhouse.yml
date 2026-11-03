@@ -9,6 +9,7 @@ on:
       - "runtime-lock.json"
       - "scripts/start_server.py"
       - "scripts/build_wheelhouse.py"
+      - "scripts/test_offline_wheelhouse.py"
       - ".github/workflows/wheelhouse.yml"
   release:
     types: [published]
