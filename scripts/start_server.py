@@ -295,8 +295,10 @@ def extract_archive_safely(archive_path: Path, destination: Path) -> None:
             if info.is_dir():
                 continue
             member = PurePosixPath(info.filename)
-            if member.is_absolute() or len(member.parts) != 1 or any(
-                part in {"", ".", ".."} for part in member.parts
+            if (
+                member.is_absolute()
+                or len(member.parts) != 1
+                or any(part in {"", ".", ".."} for part in member.parts)
             ):
                 raise RuntimeError(f"Unsafe path in runtime backup: {info.filename}")
             mode = (info.external_attr >> 16) & 0o170000
