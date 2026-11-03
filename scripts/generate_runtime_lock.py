@@ -4,6 +4,7 @@
 This file deliberately uses only the Python standard library so it can run in CI
 without adding another dependency.
 """
+
 from __future__ import annotations
 
 import argparse
