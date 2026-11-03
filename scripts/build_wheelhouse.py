@@ -157,26 +157,28 @@ def main() -> int:
         for package in selected_packages
     ]
 
-    project_wheels = sorted(args.dist_dir.glob("*.whl"))
-    project_name = lock["distribution"]["pypi_name"].replace("-", "_").lower()
-    project_version = lock["distribution"]["version"]
-    matching_project_wheels = [
-        path for path in project_wheels
-        if path.name.lower().startswith(f"{project_name}-{project_version}-")
-    ]
-    if len(matching_project_wheels) != 1:
-        raise RuntimeError(
-            f"Expected exactly one built project wheel for "
-            f"{project_name}=={project_version} in {args.dist_dir}, "
-            f"found {len(matching_project_wheels)}."
-        )
+    project_wheel = None
+    if not args.dry_run:
+        project_wheels = sorted(args.dist_dir.glob("*.whl"))
+        project_name = lock["distribution"]["pypi_name"].replace("-", "_").lower()
+        project_version = lock["distribution"]["version"]
+        matching_project_wheels = [
+            path for path in project_wheels
+            if path.name.lower().startswith(f"{project_name}-{project_version}-")
+        ]
+        if len(matching_project_wheels) != 1:
+            raise RuntimeError(
+                f"Expected exactly one built project wheel for "
+                f"{project_name}=={project_version} in {args.dist_dir}, "
+                f"found {len(matching_project_wheels)}."
+            )
+        project_wheel = matching_project_wheels[0]
 
     if args.dry_run:
         print("WHEELHOUSE_DRY_RUN=OK")
         print(f"platform={sys.platform}/{platform.machine()}")
         print(f"python={platform.python_version()}")
         print(f"dependency_count={len(choices)}")
-        print(f"project_wheel={matching_project_wheels[0].name}")
         for package, artifact in choices:
             print(f"{package['name']}=={package['version']} -> {filename_from_url(artifact['url'])}")
         return 0
@@ -197,7 +199,7 @@ def main() -> int:
             manifest_files.append(record)
             print(f"VERIFIED {package['name']}=={package['version']}", flush=True)
 
-        project_wheel = matching_project_wheels[0]
+        assert project_wheel is not None
         project_copy = temp_dir / project_wheel.name
         shutil.copy2(project_wheel, project_copy)
         manifest_files.append(
@@ -238,8 +240,9 @@ def main() -> int:
     )
     shutil.copy2(LICENSE_PATH, output_dir / "LICENSE")
 
-    system = sys.platform
-    machine = platform.machine().lower()
+    system = {"win32": "windows", "darwin": "macos", "linux": "linux"}.get(sys.platform, sys.platform)
+    raw_machine = platform.machine().lower()
+    machine = {"amd64": "amd64", "x86_64": "amd64", "arm64": "arm64", "aarch64": "arm64"}.get(raw_machine, raw_machine)
     py_tag = f"cp{sys.version_info.major}{sys.version_info.minor}"
     archive_name = (
         f"wheelhouse-{system}-{machine}-{py_tag}-"
