@@ -66,8 +66,7 @@ def main() -> int:
     with zipfile.ZipFile(archive_path) as archive:
         names = set(archive.namelist())
         expected = {
-            f"excel-workbook-assistant/{path.relative_to(SKILL_ROOT).as_posix()}"
-            for path in files
+            f"excel-workbook-assistant/{path.relative_to(SKILL_ROOT).as_posix()}" for path in files
         }
         if names != expected:
             raise RuntimeError("ZIP content check failed.")
