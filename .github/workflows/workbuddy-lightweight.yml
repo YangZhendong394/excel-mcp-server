@@ -8,6 +8,9 @@ on:
       - "workbuddy-skill/excel-workbook-assistant-lite/**"
       - "scripts/package_workbuddy_lightweight.py"
       - "scripts/test_workbuddy_lightweight.py"
+      - "scripts/test_workbook_compatibility.py"
+      - "scripts/build_formula_cache_fixture.py"
+      - "tests/fixtures/macro01.xlsm"
       - ".github/workflows/workbuddy-lightweight.yml"
   pull_request:
     branches:
@@ -45,6 +48,29 @@ jobs:
           Expand-Archive -Path "dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip" -DestinationPath $destination -Force
           $skillRoot = Join-Path $destination "excel-workbook-assistant-lite"
           python scripts/test_workbuddy_lightweight.py $skillRoot
+          python scripts/test_workbook_compatibility.py $skillRoot "tests/fixtures/macro01.xlsm"
+
+      - name: Build separate formula and real XLSM compatibility samples
+        shell: pwsh
+        run: |
+          $sampleDir = "dist/compatibility-fixtures"
+          New-Item -ItemType Directory -Path $sampleDir -Force | Out-Null
+          python scripts/build_formula_cache_fixture.py --output "$sampleDir/formula-cache-probe.xlsx" --vendor-dir build/vendor
+          Copy-Item "tests/fixtures/macro01.xlsm" "$sampleDir/real-vba-sample.xlsm"
+          @"
+          Excel 表格助手（轻量版）兼容性验收样本
+
+          1) formula-cache-probe.xlsx：包含公式，但由 openpyxl 创建，未写入 Excel 计算缓存。
+             预期：普通 read 返回公式表达式；read --values-only 返回 null/空缓存，
+             这不代表计算结果为 0。轻量版不会计算公式。
+
+          2) real-vba-sample.xlsm：来自本仓库 tests/fixtures/macro01.xlsm，原始样本来自
+             XlsxWriter 项目的测试夹具，BSD-2-Clause 许可。仅用于验证编辑普通单元格后
+             xl/vbaProject.bin 是否原样保留。
+             请勿启用或运行其中的宏；本次验收只处理文件包，不执行 VBA。
+
+          两份样本都应在单独测试目录中操作。输出应另存为新文件，不覆盖源文件。
+          "@ | Set-Content -Path "$sampleDir/README.txt" -Encoding utf8
 
       - name: Report package size and checksum
         shell: pwsh
@@ -59,5 +85,13 @@ jobs:
         with:
           name: excel-workbook-assistant-lite-2.0.0-alpha.1
           path: dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload compatibility test samples
+        uses: actions/upload-artifact@v7
+        with:
+          name: excel-workbook-assistant-compatibility-samples
+          path: dist/compatibility-fixtures/*
           if-no-files-found: error
           retention-days: 30
