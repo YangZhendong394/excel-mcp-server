@@ -193,6 +193,104 @@ def test_common_workbook_features(skill: Path, root: Path) -> None:
     print("WORKBOOK_FEATURE_CHECKS=" + json.dumps(checks, ensure_ascii=False))
 
 
+
+def test_workbook_and_sheet_management(skill: Path, root: Path) -> None:
+    """Test workbook listing and safe worksheet management."""
+    import hashlib
+
+    from openpyxl import Workbook, load_workbook
+
+    script = skill / "scripts" / "excel_workbook.py"
+    source = root / "sheet_source.xlsx"
+    workbook = Workbook()
+    workbook.active.title = "数据"
+    workbook.create_sheet("说明")
+    workbook["数据"]["A1"] = "原始内容"
+    workbook.save(source)
+    workbook.close()
+    original_hash = hashlib.sha256(source.read_bytes()).hexdigest()
+
+    listed_files = run(script, root, "list")
+    assert listed_files["ok"] and any(item["path"] == source.name for item in listed_files["workbooks"])
+
+    listed_sheets = run(script, root, "sheet", "list", "--path", source.name)
+    assert [item["name"] for item in listed_sheets["sheets"]] == ["数据", "说明"]
+
+    added = run(
+        script, root, "sheet", "add",
+        "--input", source.name, "--output", "sheet_added.xlsx",
+        "--name", "分析", "--index", "1",
+    )
+    assert added["ok"] and added["source_preserved"]
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == original_hash
+
+    renamed = run(
+        script, root, "sheet", "rename",
+        "--input", "sheet_added.xlsx", "--output", "sheet_renamed.xlsx",
+        "--name", "分析", "--new-name", "汇总",
+    )
+    assert renamed["ok"] and renamed["new_name"] == "汇总"
+
+    hidden = run(
+        script, root, "sheet", "visibility",
+        "--input", "sheet_renamed.xlsx", "--output", "sheet_hidden.xlsx",
+        "--name", "汇总", "--state", "hidden",
+    )
+    assert hidden["ok"]
+    unhidden = run(
+        script, root, "sheet", "visibility",
+        "--input", "sheet_hidden.xlsx", "--output", "sheet_visible.xlsx",
+        "--name", "汇总", "--state", "visible",
+    )
+    assert unhidden["ok"]
+
+    deleted = run(
+        script, root, "sheet", "delete",
+        "--input", "sheet_visible.xlsx", "--output", "sheet_deleted.xlsx",
+        "--name", "说明",
+    )
+    assert deleted["ok"] and deleted["remaining_sheets"] == ["数据", "汇总"]
+
+    check = load_workbook(root / "sheet_deleted.xlsx", data_only=False)
+    try:
+        assert check.sheetnames == ["数据", "汇总"]
+        assert check["数据"]["A1"].value == "原始内容"
+        assert all(sheet.sheet_state == "visible" for sheet in check.worksheets)
+    finally:
+        check.close()
+
+    duplicate = run(
+        script, root, "sheet", "add",
+        "--input", source.name, "--output", "sheet_duplicate.xlsx",
+        "--name", "数据",
+        expect_success=False,
+    )
+    assert duplicate["ok"] is False and not (root / "sheet_duplicate.xlsx").exists()
+
+    hide_last = run(
+        script, root, "sheet", "visibility",
+        "--input", "sheet_hidden.xlsx", "--output", "sheet_hide_last.xlsx",
+        "--name", "说明", "--state", "hidden",
+        expect_success=False,
+    )
+    assert hide_last["ok"] is False and not (root / "sheet_hide_last.xlsx").exists()
+
+    single = root / "single_sheet.xlsx"
+    only = Workbook()
+    only.active.title = "唯一"
+    only.save(single)
+    only.close()
+    delete_last = run(
+        script, root, "sheet", "delete",
+        "--input", single.name, "--output", "single_deleted.xlsx",
+        "--name", "唯一",
+        expect_success=False,
+    )
+    assert delete_last["ok"] is False and not (root / "single_deleted.xlsx").exists()
+
+    print("WORKBOOK_LIST_AND_SHEET_MANAGEMENT=SUCCESS")
+
+
 def main() -> int:
     if len(sys.argv) != 2:
         raise SystemExit("Usage: test_workbuddy_lightweight.py EXTRACTED_SKILL_FOLDER")
@@ -267,6 +365,7 @@ def main() -> int:
         assert not outside.exists()
 
         test_common_workbook_features(skill, root)
+        test_workbook_and_sheet_management(skill, root)
 
     print("LIGHTWEIGHT_SKILL_E2E=SUCCESS")
     return 0
