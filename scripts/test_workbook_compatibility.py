@@ -42,6 +42,33 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def test_feature_matrix(skill: Path) -> None:
+    matrix_path = skill / "FEATURE-COMPATIBILITY.md"
+    assert matrix_path.is_file(), "Feature comparison matrix is missing from the packaged Skill"
+    content = matrix_path.read_text(encoding="utf-8")
+    default_section = content.split("### 原版额外的 2 个可选 VBA 工具", 1)[0]
+    rows = [
+        line for line in default_section.splitlines()
+        if line.startswith("| ")
+        and not line.startswith("|---")
+        and not line.startswith("| 原版分组")
+    ]
+    partial = sum("部分保留" in line for line in rows)
+    missing = sum("未保留" in line for line in rows)
+    assert len(rows) == 46, f"Expected 46 default MCP tools, found {len(rows)}"
+    assert partial == 5, f"Expected 5 partially retained tools, found {partial}"
+    assert missing == 41, f"Expected 41 unimplemented tools, found {missing}"
+
+    optional_section = content.split("### 原版额外的 2 个可选 VBA 工具", 1)[1]
+    optional_rows = [
+        line for line in optional_section.splitlines()
+        if line.startswith("| ")
+        and not line.startswith("|---")
+        and not line.startswith("| 原版可选 MCP 工具")
+    ]
+    assert len(optional_rows) == 2, f"Expected 2 separately listed optional VBA tools, found {len(optional_rows)}"
+    print("MCP_FEATURE_MATRIX=46_TOTAL;5_PARTIAL;41_NOT_IMPLEMENTED;2_OPTIONAL_VBA_SEPARATE")
+
 def test_formula_cache_behavior(skill: Path, root: Path) -> None:
     from openpyxl import Workbook
 
