@@ -344,6 +344,183 @@ def command_write(args: argparse.Namespace, root: Path) -> dict[str, Any]:
         workbook.close()
 
 
+
+def validate_sheet_title(name: str, existing: list[str]) -> str:
+    """Validate an Excel worksheet title without allowing openpyxl to silently rename it."""
+    if not isinstance(name, str) or not name.strip():
+        raise SkillError("A non-empty worksheet name is required.")
+    title = name.strip()
+    if len(title) > 31 or any(ch in title for ch in "[]:*?/\\\\"):
+        raise SkillError("Worksheet names must be 1–31 characters and cannot contain []:*?/\\\\.")
+    if title.casefold() in {item.casefold() for item in existing}:
+        raise SkillError(f"A worksheet named {title!r} already exists (names are case-insensitive).")
+    return title
+
+
+def load_source_and_output(root: Path, input_name: str, output_name: str):
+    """Resolve a source and a new destination under the same allowed directory."""
+    source = resolve_path(root, input_name, must_exist=True)
+    output = resolve_path(root, output_name, must_exist=False)
+    if source == output:
+        raise SkillError("Input and output paths must be different. The source workbook is never overwritten.")
+    if source.suffix.lower() != output.suffix.lower():
+        raise SkillError("Input and output extensions must match.")
+    return source, output
+
+
+def command_list_workbooks(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    """List supported workbooks inside the allowed folder."""
+    candidates = root.rglob("*") if args.recursive else root.iterdir()
+    found: list[dict[str, Any]] = []
+    for candidate in candidates:
+        try:
+            resolved = candidate.resolve(strict=True)
+            relative = resolved.relative_to(root)
+        except (OSError, ValueError):
+            continue
+        if not resolved.is_file() or resolved.suffix.lower() not in ALLOWED_SUFFIXES:
+            continue
+        if resolved.name.startswith("~$"):
+            continue
+        found.append({"path": relative.as_posix(), "file_bytes": resolved.stat().st_size})
+    found.sort(key=lambda item: item["path"].casefold())
+    truncated = len(found) > 500
+    return {
+        "ok": True,
+        "operation": "list-workbooks",
+        "directory": str(root),
+        "count": min(len(found), 500),
+        "truncated": truncated,
+        "workbooks": found[:500],
+    }
+
+
+def command_sheet_list(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    path = resolve_path(root, args.path, must_exist=True)
+    workbook = load_checked(path)
+    try:
+        sheets = [
+            {
+                "index": index,
+                "name": sheet.title,
+                "state": sheet.sheet_state,
+                "dimension": sheet.calculate_dimension(),
+                "max_row": sheet.max_row,
+                "max_column": sheet.max_column,
+                "merged_ranges": len(sheet.merged_cells.ranges),
+                "tables": list(sheet.tables.keys()),
+                "charts": len(sheet._charts),
+            }
+            for index, sheet in enumerate(workbook.worksheets)
+        ]
+        return {"ok": True, "operation": "sheet-list", "path": str(path), "sheets": sheets}
+    finally:
+        workbook.close()
+
+
+def command_sheet_add(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    source, output = load_source_and_output(root, args.input, args.output)
+    workbook = load_checked(source)
+    try:
+        title = validate_sheet_title(args.name, workbook.sheetnames)
+        if args.index is not None and not 0 <= args.index <= len(workbook.worksheets):
+            raise SkillError(f"Worksheet index must be between 0 and {len(workbook.worksheets)}.")
+        sheet = workbook.create_sheet(title=title, index=args.index)
+        save_new(workbook, output)
+        return {
+            "ok": True,
+            "operation": "sheet-add",
+            "input": str(source),
+            "output": str(output),
+            "sheet": sheet.title,
+            "index": workbook.index(sheet),
+            "source_preserved": True,
+        }
+    finally:
+        workbook.close()
+
+
+def command_sheet_rename(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    source, output = load_source_and_output(root, args.input, args.output)
+    workbook = load_checked(source)
+    try:
+        if args.name not in workbook.sheetnames:
+            raise SkillError(f"Worksheet not found: {args.name}")
+        existing = [name for name in workbook.sheetnames if name != args.name]
+        new_title = validate_sheet_title(args.new_name, existing)
+        workbook[args.name].title = new_title
+        save_new(workbook, output)
+        return {
+            "ok": True,
+            "operation": "sheet-rename",
+            "input": str(source),
+            "output": str(output),
+            "old_name": args.name,
+            "new_name": new_title,
+            "source_preserved": True,
+        }
+    finally:
+        workbook.close()
+
+
+def command_sheet_delete(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    source, output = load_source_and_output(root, args.input, args.output)
+    workbook = load_checked(source)
+    try:
+        if args.name not in workbook.sheetnames:
+            raise SkillError(f"Worksheet not found: {args.name}")
+        sheet = workbook[args.name]
+        visible = [item for item in workbook.worksheets if item.sheet_state == "visible"]
+        if len(workbook.worksheets) <= 1:
+            raise SkillError("The last worksheet cannot be deleted.")
+        if sheet.sheet_state == "visible" and len(visible) <= 1:
+            raise SkillError("The last visible worksheet cannot be deleted. Unhide another sheet first.")
+        workbook.remove(sheet)
+        remaining_visible = [item for item in workbook.worksheets if item.sheet_state == "visible"]
+        if remaining_visible:
+            workbook.active = remaining_visible[0]
+        save_new(workbook, output)
+        return {
+            "ok": True,
+            "operation": "sheet-delete",
+            "input": str(source),
+            "output": str(output),
+            "deleted_sheet": args.name,
+            "remaining_sheets": workbook.sheetnames,
+            "source_preserved": True,
+        }
+    finally:
+        workbook.close()
+
+
+def command_sheet_visibility(args: argparse.Namespace, root: Path) -> dict[str, Any]:
+    source, output = load_source_and_output(root, args.input, args.output)
+    workbook = load_checked(source)
+    try:
+        if args.name not in workbook.sheetnames:
+            raise SkillError(f"Worksheet not found: {args.name}")
+        sheet = workbook[args.name]
+        visible = [item for item in workbook.worksheets if item.sheet_state == "visible"]
+        if args.state == "hidden" and sheet.sheet_state == "visible" and len(visible) <= 1:
+            raise SkillError("The last visible worksheet cannot be hidden.")
+        sheet.sheet_state = args.state
+        if args.state == "hidden" and workbook.active == sheet:
+            remaining_visible = [item for item in workbook.worksheets if item.sheet_state == "visible"]
+            workbook.active = remaining_visible[0]
+        save_new(workbook, output)
+        return {
+            "ok": True,
+            "operation": "sheet-visibility",
+            "input": str(source),
+            "output": str(output),
+            "sheet": args.name,
+            "state": args.state,
+            "source_preserved": True,
+        }
+    finally:
+        workbook.close()
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--allow-dir", required=True, type=Path, help="Only folder the script may access.")
@@ -369,6 +546,38 @@ def build_parser() -> argparse.ArgumentParser:
     write.add_argument("--start-cell", required=True)
     write.add_argument("--rows-json", required=True)
     write.add_argument("--allow-formulas", action="store_true")
+
+    list_cmd = commands.add_parser("list", help="List Excel workbooks inside the allowed folder.")
+    list_cmd.add_argument("--recursive", action="store_true")
+
+    sheet = commands.add_parser("sheet", help="Manage worksheets in a copied workbook.")
+    sheet_actions = sheet.add_subparsers(dest="sheet_action", required=True)
+
+    sheet_list = sheet_actions.add_parser("list", help="List worksheets and their basic structure.")
+    sheet_list.add_argument("--path", required=True)
+
+    sheet_add = sheet_actions.add_parser("add", help="Add a worksheet to a new workbook copy.")
+    sheet_add.add_argument("--input", required=True)
+    sheet_add.add_argument("--output", required=True)
+    sheet_add.add_argument("--name", required=True)
+    sheet_add.add_argument("--index", type=int, default=None, help="Zero-based position; default appends.")
+
+    sheet_rename = sheet_actions.add_parser("rename", help="Rename a worksheet in a new workbook copy.")
+    sheet_rename.add_argument("--input", required=True)
+    sheet_rename.add_argument("--output", required=True)
+    sheet_rename.add_argument("--name", required=True, help="Current worksheet name.")
+    sheet_rename.add_argument("--new-name", required=True)
+
+    sheet_delete = sheet_actions.add_parser("delete", help="Delete a worksheet from a new workbook copy.")
+    sheet_delete.add_argument("--input", required=True)
+    sheet_delete.add_argument("--output", required=True)
+    sheet_delete.add_argument("--name", required=True)
+
+    sheet_visibility = sheet_actions.add_parser("visibility", help="Hide or unhide a worksheet in a new copy.")
+    sheet_visibility.add_argument("--input", required=True)
+    sheet_visibility.add_argument("--output", required=True)
+    sheet_visibility.add_argument("--name", required=True)
+    sheet_visibility.add_argument("--state", choices=("visible", "hidden"), required=True)
     return parser
 
 
@@ -387,6 +596,21 @@ def main() -> int:
             result = command_read(args, root)
         elif args.command == "write":
             result = command_write(args, root)
+        elif args.command == "list":
+            result = command_list_workbooks(args, root)
+        elif args.command == "sheet":
+            if args.sheet_action == "list":
+                result = command_sheet_list(args, root)
+            elif args.sheet_action == "add":
+                result = command_sheet_add(args, root)
+            elif args.sheet_action == "rename":
+                result = command_sheet_rename(args, root)
+            elif args.sheet_action == "delete":
+                result = command_sheet_delete(args, root)
+            elif args.sheet_action == "visibility":
+                result = command_sheet_visibility(args, root)
+            else:  # pragma: no cover
+                raise SkillError("Unknown worksheet operation.")
         else:  # pragma: no cover
             raise SkillError("Unknown command.")
         emit(result)
