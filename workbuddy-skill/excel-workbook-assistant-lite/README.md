@@ -2,9 +2,9 @@
 
 该目录是独立的 WorkBuddy 普通 Skill 原型，不覆盖原 MCP 版目录。
 
-当前原型包含本地 Excel CLI、Skill 指令和第三方依赖打包说明。发布 ZIP 时由 GitHub Actions 将固定版本 openpyxl 3.1.5 与 et-xmlfile 2.0.0 的纯 Python 包源码放入 vendor/，用户运行时不执行 pip，也不下载运行依赖。
+当前开发版包含本地 Excel CLI、Skill 指令和第三方依赖打包说明。发布 ZIP 时由 GitHub Actions 将固定版本 openpyxl 3.1.5 与 et-xmlfile 2.0.0 的纯 Python 包源码放入 vendor/，用户运行时不执行 pip，也不下载运行依赖。
 
-当前只实现新建、结构检查、区域读取，以及将单元格写入新副本。原版默认 46 个 MCP 工具的逐项差异见 [FEATURE-COMPATIBILITY.md](FEATURE-COMPATIBILITY.md)。复杂透视表、切片器、VBA 深度编辑和底层 XML 精细修复尚未实现。
+当前已实现工作簿新建、结构检查、区域读取、单元格写入新副本、授权目录工作簿列表，以及工作表列表、新增、重命名、删除、隐藏和取消隐藏。原版默认 46 个 MCP 工具的逐项差异见 [FEATURE-COMPATIBILITY.md](FEATURE-COMPATIBILITY.md)。复杂透视表、切片器、VBA 深度编辑和底层 XML 精细修复尚未实现。
 
 ## 工作簿保留测试与已知边界
 
@@ -12,4 +12,4 @@
 
 WorkBuddy 本机实测还发现：某些 Excel x14 扩展条件格式（本次为带渐变属性的数据条）会在 openpyxl 3.1.5 重新保存时被标准化，渐变扩展属性丢失，但数据条规则、阈值与颜色保留。本次样本人工打开检查后，视觉观感基本一致。此结果不能外推为所有扩展条件格式或复杂工作簿均无损。
 
-CI 还使用仓库中的真实 .xlsm 样本测试了 VBA 二进制被动保留：另存普通单元格修改副本后，xl/vbaProject.bin 与源文件逐字节一致，源文件未改变。这不表示轻量版支持读取或修改 VBA 代码，也不覆盖数字签名、ActiveX 或其他宏相关对象；WorkBuddy 本机复验仍待完成。
+CI 和 WorkBuddy 本机均使用真实 .xlsm 样本验收了 VBA 二进制被动保留：另存普通单元格修改副本后，xl/vbaProject.bin 与源文件逐字节一致，原文件 SHA-256 和 mtime 未改变。这不表示轻量版支持读取或修改 VBA 代码，也不覆盖数字签名、ActiveX 或其他宏相关对象。
