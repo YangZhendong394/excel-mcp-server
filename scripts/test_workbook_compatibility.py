@@ -176,6 +176,7 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory(prefix="workbuddy-excel-compat-") as temp:
         root = Path(temp)
+        test_feature_matrix(skill)
         test_formula_cache_behavior(skill, root)
         test_real_xlsm_vba_passthrough(skill, root, macro_fixture)
         test_corrupt_workbook_fails_safely(skill, root)
