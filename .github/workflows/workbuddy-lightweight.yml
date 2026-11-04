@@ -39,13 +39,13 @@ jobs:
 
       - name: Build self-contained Skill ZIP
         run: |
-          python scripts/package_workbuddy_lightweight.py --vendor-dir build/vendor --output dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip
+          python scripts/package_workbuddy_lightweight.py --vendor-dir build/vendor --output dist/excel-workbook-assistant-lite-2.0.0-alpha.2.zip
 
       - name: Extract and test the exact ZIP that will be distributed
         shell: pwsh
         run: |
           $destination = Join-Path $env:RUNNER_TEMP "excel-workbook-assistant-lite"
-          Expand-Archive -Path "dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip" -DestinationPath $destination -Force
+          Expand-Archive -Path "dist/excel-workbook-assistant-lite-2.0.0-alpha.2.zip" -DestinationPath $destination -Force
           $skillRoot = Join-Path $destination "excel-workbook-assistant-lite"
           python scripts/test_workbuddy_lightweight.py $skillRoot
           python scripts/test_workbook_compatibility.py $skillRoot "tests/fixtures/macro01.xlsm"
@@ -75,7 +75,7 @@ jobs:
       - name: Report package size and checksum
         shell: pwsh
         run: |
-          $file = Get-Item "dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip"
+          $file = Get-Item "dist/excel-workbook-assistant-lite-2.0.0-alpha.2.zip"
           $hash = (Get-FileHash $file.FullName -Algorithm SHA256).Hash.ToLower()
           Write-Host "SKILL_ZIP_BYTES=$($file.Length)"
           Write-Host "SKILL_ZIP_SHA256=$hash"
@@ -83,8 +83,8 @@ jobs:
       - name: Upload test package
         uses: actions/upload-artifact@v7
         with:
-          name: excel-workbook-assistant-lite-2.0.0-alpha.1
-          path: dist/excel-workbook-assistant-lite-2.0.0-alpha.1.zip
+          name: excel-workbook-assistant-lite-2.0.0-alpha.2
+          path: dist/excel-workbook-assistant-lite-2.0.0-alpha.2.zip
           if-no-files-found: error
           retention-days: 30
 
