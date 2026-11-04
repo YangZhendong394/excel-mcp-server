@@ -81,7 +81,7 @@ def main() -> int:
     stage.mkdir(parents=True)
 
     try:
-        for required in ("SKILL.md", "README.md", "THIRD_PARTY_NOTICES.md"):
+        for required in ("SKILL.md", "README.md", "THIRD_PARTY_NOTICES.md", "FEATURE-COMPATIBILITY.md"):
             shutil.copy2(SKILL_SOURCE / required, stage / required)
         (stage / "scripts").mkdir(parents=True, exist_ok=True)
         shutil.copy2(SKILL_SOURCE / "scripts" / "excel_workbook.py", stage / "scripts" / "excel_workbook.py")
