@@ -92,7 +92,7 @@ def main() -> int:
 
         manifest = {
             "skill": PACKAGE_NAME,
-            "version": "2.0.0-alpha.1",
+            "version": "2.0.0-alpha.2",
             "python": "3.13+",
             "network_required_at_runtime": False,
             "runtime_install_required": False,
