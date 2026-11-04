@@ -234,13 +234,13 @@ def test_workbook_and_sheet_management(skill: Path, root: Path) -> None:
     hidden = run(
         script, root, "sheet", "visibility",
         "--input", "sheet_renamed.xlsx", "--output", "sheet_hidden.xlsx",
-        "--name", "汇总", "--state", "hidden",
+        "--name", "数据", "--state", "hidden",
     )
     assert hidden["ok"]
     unhidden = run(
         script, root, "sheet", "visibility",
         "--input", "sheet_hidden.xlsx", "--output", "sheet_visible.xlsx",
-        "--name", "汇总", "--state", "visible",
+        "--name", "数据", "--state", "visible",
     )
     assert unhidden["ok"]
 
