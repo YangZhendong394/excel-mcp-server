@@ -48,7 +48,9 @@ jobs:
           Expand-Archive -Path "dist/excel-workbook-assistant-lite-2.0.0-alpha.2.zip" -DestinationPath $destination -Force
           $skillRoot = Join-Path $destination "excel-workbook-assistant-lite"
           python scripts/test_workbuddy_lightweight.py $skillRoot
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python scripts/test_workbook_compatibility.py $skillRoot "tests/fixtures/macro01.xlsm"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Build separate formula and real XLSM compatibility samples
         shell: pwsh
@@ -56,6 +58,7 @@ jobs:
           $sampleDir = "dist/compatibility-fixtures"
           New-Item -ItemType Directory -Path $sampleDir -Force | Out-Null
           python scripts/build_formula_cache_fixture.py --output "$sampleDir/formula-cache-probe.xlsx" --vendor-dir build/vendor
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Copy-Item "tests/fixtures/macro01.xlsm" "$sampleDir/real-vba-sample.xlsm"
           @"
           Excel 表格助手（轻量版）兼容性验收样本
