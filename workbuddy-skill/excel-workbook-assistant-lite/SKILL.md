@@ -2,7 +2,7 @@
 name: excel-workbook-assistant-lite
 display_name: Excel 表格助手（轻量版）
 description: 在本机读取、分析、整理、修改和生成 Excel 工作簿，不启动 MCP 服务，也不联网安装运行依赖。
-version: 2.0.0-alpha.1
+version: 2.0.0-alpha.2
 author: 没皮没脸
 ---
 
@@ -24,31 +24,65 @@ author: 没皮没脸
 
 ## 可用操作
 
-先确认文件夹完整路径，再从 Skill 根目录调用脚本：
+先确认文件夹完整路径，再从 Skill 根目录调用脚本。所有文件命令都必须传入 \`--allow-dir\`：
+
+### 列出工作簿
+
+\`\`\`bash
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" list
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" list --recursive
+\`\`\`
+
+### 查看工作簿和工作表
+
+\`\`\`bash
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" inspect --path "销售明细.xlsx"
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" sheet list --path "销售明细.xlsx"
+\`\`\`
 
 ### 新建工作簿
 
-python scripts/excel_workbook.py --allow-dir "D:\Excel文件夹" create --path "新工作簿.xlsx" --sheets "数据,汇总"
+\`\`\`bash
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" create --path "新工作簿.xlsx" --sheets "数据,汇总"
+\`\`\`
 
-### 查看工作簿结构
+### 工作表管理（都另存为新副本）
 
-python scripts/excel_workbook.py --allow-dir "D:\Excel文件夹" inspect --path "销售明细.xlsx"
+\`\`\`bash
+# 给已有工作簿新增工作表，可选指定从 0 开始的位置
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" sheet add --input "销售明细.xlsx" --output "销售明细_加表.xlsx" --name "汇总" --index 1
+
+# 重命名工作表
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" sheet rename --input "销售明细.xlsx" --output "销售明细_改名.xlsx" --name "Sheet1" --new-name "原始数据"
+
+# 删除工作表
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" sheet delete --input "销售明细.xlsx" --output "销售明细_删表.xlsx" --name "临时表"
+
+# 隐藏/取消隐藏工作表
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" sheet visibility --input "销售明细.xlsx" --output "销售明细_隐藏.xlsx" --name "辅助表" --state hidden
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" sheet visibility --input "销售明细_隐藏.xlsx" --output "销售明细_显示.xlsx" --name "辅助表" --state visible
+\`\`\`
+
+Skill 会拒绝删除最后一张工作表、隐藏最后一张可见工作表、使用重复或非法工作表名称，以及覆盖已存在的输出文件。
 
 ### 读取区域
 
-python scripts/excel_workbook.py --allow-dir "D:\Excel文件夹" read --path "销售明细.xlsx" --sheet "Sheet1" --range "A1:D20"
+\`\`\`bash
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" read --path "销售明细.xlsx" --sheet "Sheet1" --range "A1:D20"
+\`\`\`
 
-需要读取公式缓存值而不是公式表达式时，添加 --values-only，并向用户说明缓存值可能为空或过期。
+需要读取公式缓存值而不是公式表达式时，添加 \`--values-only\`，并向用户说明缓存值可能为空或过期。
 
-### 修改并另存为副本
+### 修改单元格并另存为副本
 
-python scripts/excel_workbook.py --allow-dir "D:\Excel文件夹" write --input "销售明细.xlsx" --output "销售明细_整理版.xlsx" --sheet "Sheet1" --start-cell "A1" --rows-json '[["项目","数量"],["苹果",12]]'
+\`\`\`bash
+python scripts/excel_workbook.py --allow-dir "D:\\Excel文件夹" write --input "销售明细.xlsx" --output "销售明细_整理版.xlsx" --sheet "Sheet1" --start-cell "A1" --rows-json '[["项目","数量"],["苹果",12]]'
+\`\`\`
 
-只有用户明确要求写入 Excel 公式时才添加 --allow-formulas。输出文件必须是新文件名，不能与输入文件相同，不能覆盖已存在的文件。
-
+只有用户明确要求写入 Excel 公式时才添加 \`--allow-formulas\`。脚本会保存公式文本，但不会计算公式。输出文件必须是新文件名，不能与输入文件相同，不能覆盖已存在的文件。
 ## 当前版本范围
 
-这是轻量版首个功能原型，优先支持 xlsx/xlsm 的新建、结构检查、区域读取以及另存为副本的单元格写入。它不是原 MCP Server 46 个工具的等价替代品；当前 46 项对照中只有 5 项具备部分对应能力，其余 41 项没有对应入口。逐项差异见包内 FEATURE-COMPATIBILITY.md。透视表、切片器、VBA 深度读写和大型文件底层 XML 精细修复均未纳入本原型。
+当前开发版支持 xlsx/xlsm 的新建、结构检查、区域读取、单元格写入副本、授权目录工作簿列表，以及工作表列表、新增、重命名、删除、隐藏和取消隐藏。原 MCP Server 默认 46 项工具中，目前 4 项已有完整对应入口、5 项部分对应、37 项尚未实现；逐项差异见包内 FEATURE-COMPATIBILITY.md。工作表复制、行列插删、排序查找、格式设置、数据清洗和专业分析仍在开发计划中，不能向用户承诺已支持。透视表、切片器、VBA 深度读写和大型文件底层 XML 精细修复尚未纳入当前版本。
 
 ### 已完成的工作簿保留验收
 
