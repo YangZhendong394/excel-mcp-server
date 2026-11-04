@@ -249,10 +249,16 @@ def test_workbook_and_sheet_management(skill: Path, root: Path) -> None:
         "--name", "数据", "--state", "visible",
     )
     assert unhidden["ok"]
+    unhidden_second = run(
+        script, root, "sheet", "visibility",
+        "--input", "sheet_visible.xlsx", "--output", "sheet_all_visible.xlsx",
+        "--name", "汇总", "--state", "visible",
+    )
+    assert unhidden_second["ok"]
 
     deleted = run(
         script, root, "sheet", "delete",
-        "--input", "sheet_visible.xlsx", "--output", "sheet_deleted.xlsx",
+        "--input", "sheet_all_visible.xlsx", "--output", "sheet_deleted.xlsx",
         "--name", "说明",
     )
     assert deleted["ok"] and deleted["remaining_sheets"] == ["数据", "汇总"]
